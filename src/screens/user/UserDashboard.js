@@ -1,38 +1,58 @@
+// src/screens/user/UserDashboard.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Button } from '../../components/common';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
+import { COLORS, SIZES, FONTS } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 
 const UserDashboard = ({ navigation }) => {
-  const { logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>User Dashboard</Text>
-      <Button 
-        title="View Profile" 
-        onPress={() => navigation.navigate('Profile')} 
-      />
-      <Button 
-        title="Logout" 
-        onPress={logout}
-        type="secondary" 
-      />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Welcome, {user?.name}</Text>
+      </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Profile')}
+      >
+        <Text style={styles.buttonText}>View Profile</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    padding: SIZES.padding,
+    backgroundColor: COLORS.white,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    ...FONTS.bold,
+    fontSize: SIZES.large,
+    color: COLORS.black,
+  },
+  button: {
+    margin: SIZES.padding,
+    padding: SIZES.padding,
+    backgroundColor: COLORS.primary,
+    borderRadius: SIZES.radius,
+    alignItems: 'center',
+  },
+  buttonText: {
+    ...FONTS.medium,
+    fontSize: SIZES.font,
+    color: COLORS.white,
   },
 });
 

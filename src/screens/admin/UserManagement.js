@@ -1,23 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
+import { COLORS, SIZES, FONTS } from '../../constants/theme';
 
 const UserManagement = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>User Management</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>User Management</Text>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: COLORS.background,
+  },
+  content: {
+    padding: SIZES.padding,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    ...FONTS.bold,
+    fontSize: SIZES.large,
+    color: COLORS.black,
   },
 });
 

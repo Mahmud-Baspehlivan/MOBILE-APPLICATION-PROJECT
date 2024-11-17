@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import AuthNavigator from './AuthNavigator';
 import AdminNavigator from './AdminNavigator';
@@ -13,17 +12,11 @@ const AppNavigator = () => {
     return <Loading />;
   }
 
-  return (
-    <NavigationContainer>
-      {!user ? (
-        <AuthNavigator />
-      ) : user.role === 'admin' ? (
-        <AdminNavigator />
-      ) : (
-        <UserNavigator />
-      )}
-    </NavigationContainer>
-  );
+  if (!user) {
+    return <AuthNavigator />;
+  }
+
+  return user.role === 'admin' ? <AdminNavigator /> : <UserNavigator />;
 };
 
 export default AppNavigator;
