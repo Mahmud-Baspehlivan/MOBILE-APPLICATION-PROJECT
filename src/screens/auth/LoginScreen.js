@@ -1,162 +1,212 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  Text, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
   Alert,
-  SafeAreaView,
+  ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard
+  Platform
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
-import { Input, Button } from '../../components/common';
-import { COLORS, SIZES, FONTS } from '../../constants/theme';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
-const LoginScreen = ({ navigation }) => {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { login } = useAuth();
 
+  // Email formatını kontrol eden fonksiyon
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Form validasyonu
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email is invalid';
-    
-    if (!password) newErrors.password = 'Password is required';
-    else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+
+    // Email validasyonu
+    if (!email) {
+      newErrors.email = 'Email zorunludur';
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Geçerli bir email adresi giriniz';
+    }
+
+    // Şifre validasyonu
+    if (!password) {
+      newErrors.password = 'Şifre zorunludur';
+    } else if (password.length < 6) {
+      newErrors.password = 'Şifre en az 6 karakter olmalıdır';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleLogin = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
-    setIsLoading(true);
+    setLoading(true);
     try {
-      await login(email, password);
+      const trimmedEmail = email.trim().toLowerCase();
+      await signInWithEmailAndPassword(auth, trimmedEmail, password);
+      // Başarılı giriş - Navigation AppNavigator'da otomatik olarak yönetiliyor
     } catch (error) {
-      Alert.alert('Error', error.message || 'Login failed');
+      let errorMessage = 'Giriş yapılırken bir hata oluştu';
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Geçersiz email adresi';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'Kullanıcı bulunamadı';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Hatalı şifre';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin';
+          break;
+        default:
+          errorMessage = error.message;
+      }
+      Alert.alert('Hata', errorMessage);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardView}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.inner}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Welcome Back</Text>
-              <Text style={styles.subtitle}>Sign in to continue</Text>
-            </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Giriş Yap</Text>
 
-            <View style={styles.form}>
-              <Input
-                label="Email"
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (errors.email) {
-                    setErrors(prev => ({ ...prev, email: null }));
-                  }
-                }}
-                error={errors.email}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                placeholder="Enter your email"
-              />
+        <View style={styles.inputGroup}>
+          <TextInput
+            style={[styles.input, errors.email && styles.inputError]}
+            placeholder="Email"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              setErrors((prev) => ({ ...prev, email: null }));
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {errors.email && (
+            <Text style={styles.errorText}>{errors.email}</Text>
+          )}
+        </View>
 
-              <Input
-                label="Password"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (errors.password) {
-                    setErrors(prev => ({ ...prev, password: null }));
-                  }
-                }}
-                error={errors.password}
-                secureTextEntry
-                placeholder="Enter your password"
-              />
+        <View style={styles.inputGroup}>
+          <TextInput
+            style={[styles.input, errors.password && styles.inputError]}
+            placeholder="Şifre"
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              setErrors((prev) => ({ ...prev, password: null }));
+            }}
+            secureTextEntry
+          />
+          {errors.password && (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          )}
+        </View>
 
-              <Button 
-                title="Sign In"
-                onPress={handleLogin}
-                loading={isLoading}
-              />
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text style={styles.buttonText}>Giriş Yap</Text>
+          )}
+        </TouchableOpacity>
 
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>Don't have an account? </Text>
-                <TouchableWithoutFeedback 
-                  onPress={() => navigation.navigate('Register')}
-                >
-                  <Text style={styles.footerLink}>Sign Up</Text>
-                </TouchableWithoutFeedback>
-              </View>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <TouchableOpacity
+          style={styles.registerLink}
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.registerText}>
+            Hesabınız yok mu? Kayıt Olun
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#fff',
   },
-  keyboardView: {
+  formContainer: {
     flex: 1,
-  },
-  inner: {
-    flex: 1,
-    padding: SIZES.padding * 2,
     justifyContent: 'center',
-  },
-  header: {
-    marginBottom: SIZES.padding * 2,
+    padding: 20,
   },
   title: {
-    ...FONTS.bold,
-    fontSize: SIZES.extraLarge,
-    color: COLORS.black,
-    marginBottom: SIZES.base,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    textAlign: 'center',
   },
-  subtitle: {
-    ...FONTS.regular,
-    fontSize: SIZES.font,
-    color: COLORS.gray,
+  inputGroup: {
+    marginBottom: 15,
   },
-  form: {
-    marginVertical: SIZES.padding,
+  input: {
+    backgroundColor: '#f5f5f5',
+    height: 50,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
-  footer: {
-    flexDirection: 'row',
+  inputError: {
+    borderColor: '#ff3b30',
+  },
+  errorText: {
+    color: '#ff3b30',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 5,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    height: 50,
+    borderRadius: 8,
     justifyContent: 'center',
-    marginTop: SIZES.padding,
+    alignItems: 'center',
+    marginTop: 20,
   },
-  footerText: {
-    ...FONTS.regular,
-    color: COLORS.gray,
-    fontSize: SIZES.font,
+  buttonDisabled: {
+    backgroundColor: '#cccccc',
   },
-  footerLink: {
-    ...FONTS.medium,
-    color: COLORS.primary,
-    fontSize: SIZES.font,
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  registerLink: {
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  registerText: {
+    color: '#007AFF',
+    fontSize: 16,
   },
 });
-
-export default LoginScreen;
