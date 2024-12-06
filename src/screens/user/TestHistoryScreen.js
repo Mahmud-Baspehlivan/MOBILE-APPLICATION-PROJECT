@@ -179,7 +179,7 @@ export default function TestHistoryScreen() {
                   <Text style={styles.testTitle}>{key}</Text>
                   <View style={styles.valueWrapper}>
                     <Text style={styles.testValue}>{value}</Text>
-                    <Text style={styles.expandIcon}>{expandedItems[key] ? '↑' : '↓'}</Text>
+                    <Text style={styles.expandIcon}>{expandedItems[key] ? '-' : '+'}</Text>
                   </View>
                 </TouchableOpacity>
 
