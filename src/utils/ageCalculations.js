@@ -2,47 +2,118 @@ export const calculateAgeAtDate = (birthDate, testDate) => {
   const birth = birthDate instanceof Date ? birthDate : birthDate.toDate();
   const test = testDate instanceof Date ? testDate : testDate.toDate();
   
-  let age = test.getFullYear() - birth.getFullYear();
-  const monthDiff = test.getMonth() - birth.getMonth();
-  
-  // Ay ve gün kontrolü
-  if (monthDiff < 0 || (monthDiff === 0 && test.getDate() < birth.getDate())) {
-    age--;
+  let years = test.getFullYear() - birth.getFullYear();
+  let months = test.getMonth() - birth.getMonth();
+  let days = test.getDate() - birth.getDate();
+
+  if (months < 0 || (months === 0 && days < 0)) {
+    years--;
+    months += 12;
   }
 
-  // Ay cinsinden yaş (küçük yaşlar için)
-  const months = age * 12 + (test.getMonth() - birth.getMonth());
-  
-  // Gün cinsinden yaş (yenidoğanlar için)
-  const days = Math.floor((test - birth) / (1000 * 60 * 60 * 24));
+  if (days < 0) {
+    months--;
+    const lastDayOfMonth = new Date(test.getFullYear(), test.getMonth(), 0).getDate();
+    days += lastDayOfMonth;
+  }
 
-  return { years: age, months, days };
+  return {
+    years,
+    months,
+    days
+  };
 };
 
-export const getAgeGroup = (birthDate, testDate, testType) => {
+const AGE_GROUP_MAPPINGS = {
+  'TÜBİTAK': {
+    ranges: [
+      { max: 1, group: '0-30 days' },
+      { max: 3, group: '1-3 months' },
+      { max: 6, group: '4-6 months' },
+      { max: 12, group: '7-12 months' },
+      { max: 24, group: '13-24 months' },
+      { max: 36, group: '25-36 months' },
+      { max: 60, group: '3-5 years' },
+      { max: 96, group: '6-8 years' },
+      { max: 132, group: '9-11 years' },
+      { max: 192, group: '12-16 years' },
+      { max: 216, group: '17-18 years' },
+      { max: Infinity, group: 'Older than 18 years' }
+    ],
+    useMonths: true
+  },
+  'kilavuz-ap': {
+    ranges: [
+      { max: 5, group: '0-5 months' },
+      { max: 9, group: '5-9 months' },
+      { max: 15, group: '9-15 months' },
+      { max: 24, group: '15-24 months' },
+      { max: 48, group: '2-4 years' },
+      { max: 84, group: '4-7 years' },
+      { max: 120, group: '7-10 years' },
+      { max: 156, group: '10-13 years' },
+      { max: 192, group: '13-16 years' },
+      { max: 216, group: '16-18 years' },
+      { max: Infinity, group: 'Older than 18 years' }
+    ],
+    useMonths: true
+  },
+  'kilavuz-cilv': {
+    ranges: [
+      { max: 1, group: '0-1 months' },
+      { max: 4, group: '1-4 months' },
+      { max: 7, group: '4-7 months' },
+      { max: 13, group: '7-13 months' },
+      { max: 36, group: '1-3 years' },
+      { max: 72, group: '3-6 years' },
+      { max: Infinity, group: 'Older than 6 years' }
+    ],
+    useMonths: true
+  },
+  'kilavuz-os': {
+    ranges: [
+      { max: 3, group: '1-3 months' },
+      { max: 6, group: '4-6 months' },
+      { max: 12, group: '7-12 months' },
+      { max: 24, group: '13-24 months' },
+      { max: 36, group: '25-36 months' },
+      { max: 60, group: '3-5 years' },
+      { max: 96, group: '6-8 years' },
+      { max: 132, group: '9-11 years' },
+      { max: 192, group: '12-16 years' }
+    ],
+    useMonths: true
+  },
+  'kilavuz-tjp': {
+    ranges: [
+      { max: 1, group: '0-30 days' },
+      { max: 5, group: '1-5 months' },
+      { max: 8, group: '6-8 months' },
+      { max: 12, group: '9-12 months' },
+      { max: 24, group: '13-24 months' },
+      { max: 36, group: '25-36 months' },
+      { max: 48, group: '37-48 months' },
+      { max: 72, group: '49-72 months' },
+      { max: 96, group: '7-8 years' },
+      { max: 120, group: '9-10 years' },
+      { max: 144, group: '11-12 years' },
+      { max: 168, group: '13-14 years' },
+      { max: 192, group: '15-16 years' },
+      { max: Infinity, group: 'Older than 16 years' }
+    ],
+    useMonths: true
+  }
+ };
+
+export const getAgeGroup = (birthDate, testDate, testType, articleName) => {
   const age = calculateAgeAtDate(birthDate, testDate);
   const totalMonths = age.years * 12 + age.months;
 
-  if (['IgG1', 'IgG2', 'IgG3', 'IgG4'].includes(testType)) {
-    if (totalMonths >= 25 && totalMonths <= 36) return "25-36 months";
-    if (totalMonths <= 60) return "3-5 years";
-    if (totalMonths <= 96) return "6-8 years";
-    if (totalMonths <= 132) return "9-11 years";
-    if (totalMonths <= 192) return "12-16 years";
-    if (totalMonths <= 216) return "16-18 years";
-  } else {
-    if (age.days <= 30) return "0-30 days";
-    if (totalMonths <= 3) return "1-3 months";
-    if (totalMonths <= 6) return "4-6 months";
-    if (totalMonths <= 12) return "7-12 months";
-    if (totalMonths <= 24) return "13-24 months";
-    if (totalMonths <= 36) return "25-36 months";
-    if (totalMonths <= 60) return "3-5 years";
-    if (totalMonths <= 96) return "6-8 years";
-    if (totalMonths <= 132) return "9-11 years";
-    if (totalMonths <= 192) return "12-16 years";
-    if (totalMonths <= 216) return "16-18 years";
-  }
+  const mapping = AGE_GROUP_MAPPINGS[articleName];
+  if (!mapping) return null;
+
+  const ageValue = mapping.useMonths ? totalMonths : age.years;
+  const range = mapping.ranges.find(r => ageValue <= r.max);
   
-  return "Other";
+  return range ? range.group : null;
 };
