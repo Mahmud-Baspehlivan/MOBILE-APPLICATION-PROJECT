@@ -13,7 +13,7 @@ import UserProfileScreen from "../screens/user/UserProfileScreen";
 import TestHistoryScreen from "../screens/user/TestHistoryScreen";
 
 // Admin Screens
-import ReferenceValuesUploadScreen from "../screens/admin/ReferenceValuesUploadScreen";
+import ReferenceValuesScreen from "../screens/admin/ReferenceValuesScreen";
 import TestEntryScreen from "../screens/admin/TestEntryScreen";
 import PatientTestsScreen from "../screens/admin/PatientTestsScreen";
 
@@ -74,7 +74,7 @@ function AdminTabs() {
       />
       <Tab.Screen
         name="ReferenceValues"
-        component={ReferenceValuesUploadScreen}
+        component={ReferenceValuesScreen}
         options={{
           title: "Referans Değerler",
           tabBarIcon: ({ color, size }) => (
