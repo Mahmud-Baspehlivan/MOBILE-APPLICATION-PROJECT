@@ -107,7 +107,7 @@ function AdminTabs() {
         name="Users"
         component={UserProfileScreen}
         options={{
-          title: "Hastalar",
+          title: "Profil",
           tabBarIcon: ({ color, size }) => (
             <Icon name="user-o" color={color} size={size} />
           ),

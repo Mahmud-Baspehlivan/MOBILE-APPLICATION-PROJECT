@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TextInput,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -28,6 +29,9 @@ export default function PatientTestsScreen() {
   const [selectedUserData, setSelectedUserData] = useState(null);
   const [selectedTest, setSelectedTest] = useState(null);
   const [expandedItems, setExpandedItems] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState(users);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -145,7 +149,7 @@ export default function PatientTestsScreen() {
           <Text style={styles.dateYear}>{item.date.getFullYear()}</Text>
         </View>
         <View style={styles.testInfo}>
-          <Text style={styles.ageText}>Test tarihinde yaş: {ageText}</Text>
+          <Text style={styles.ageText}>Test tarihindeki yaş: {ageText}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -284,26 +288,49 @@ export default function PatientTestsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedUser}
-          onValueChange={(itemValue) => {
-            setSelectedUser(itemValue);
-            setSelectedTest(null);
-            if (itemValue) fetchTests(itemValue);
+      <View style={styles.searchPickerContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Hasta ara..."
+          value={searchQuery}
+          onChangeText={(query) => {
+            setSearchQuery(query);
+            const filtered = users.filter(
+              (user) =>
+                user.fullName.toLowerCase().includes(query.toLowerCase()) ||
+                user.email.toLowerCase().includes(query.toLowerCase())
+            );
+            setFilteredUsers(filtered);
           }}
-        >
-          <Picker.Item label="Hasta seçin" value="" />
-          {users.map((user) => (
-            <Picker.Item
-              key={user.id}
-              label={`${user.fullName} (${user.email})`}
-              value={user.id}
-            />
-          ))}
-        </Picker>
-      </View>
+          onFocus={() => setIsSearchActive(true)}
+        />
 
+        {isSearchActive && (
+          <FlatList
+            data={searchQuery ? filteredUsers : users}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.userItem}
+                onPress={() => {
+                  setSelectedUser(item.id);
+                  setSelectedTest(null);
+                  fetchTests(item.id);
+                  setSearchQuery(""); // Arama kutusunu sıfırla
+                  setIsSearchActive(false); // Listeyi gizle
+                }}
+              >
+                <Text style={styles.userText}>
+                  {item.fullName} ({item.email})
+                </Text>
+              </TouchableOpacity>
+            )}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>Kullanıcı bulunamadı</Text>
+            }
+          />
+        )}
+      </View>
       {selectedUser &&
         (selectedTest ? (
           renderTestDetails()
@@ -512,5 +539,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#007AFF",
     marginTop: 5,
+  },
+  searchPickerContainer: {
+    margin: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  searchBar: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+  userItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  userText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  emptyText: {
+    textAlign: "center",
+    color: "#999",
+    marginTop: 10,
   },
 });

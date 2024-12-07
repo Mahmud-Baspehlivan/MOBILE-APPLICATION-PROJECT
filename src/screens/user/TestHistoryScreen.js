@@ -50,7 +50,9 @@ export default function TestHistoryScreen() {
         date: doc.data().date.toDate(),
       }));
 
-      setTests(testsData);
+      const sortedTestsData = testsData.sort((a, b) => b.date - a.date);
+
+      setTests(sortedTestsData);
     } catch (error) {
       console.error("Error fetching tests:", error);
     } finally {
@@ -119,7 +121,7 @@ export default function TestHistoryScreen() {
           <Text style={styles.dateYear}>{item.date.getFullYear()}</Text>
         </View>
         <View style={styles.testInfo}>
-          <Text style={styles.ageText}>Test tarihinde yaş: {ageText}</Text>
+          <Text style={styles.ageText}>Test tarihindeki yaş: {ageText}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -167,19 +169,27 @@ export default function TestHistoryScreen() {
             const value = selectedTest.values[key];
             if (!value) return null;
 
-            const articleResults = getTestStatusForAllArticles(value, key, selectedTest.date);
+            const articleResults = getTestStatusForAllArticles(
+              value,
+              key,
+              selectedTest.date
+            );
             if (!articleResults?.length) return null;
 
             return (
               <View style={styles.testSection}>
                 <TouchableOpacity
-                  onPress={() => setExpandedItems(prev => ({...prev, [key]: !prev[key]}))}
+                  onPress={() =>
+                    setExpandedItems((prev) => ({ ...prev, [key]: !prev[key] }))
+                  }
                   style={styles.testTitleContainer}
                 >
                   <Text style={styles.testTitle}>{key}</Text>
                   <View style={styles.valueWrapper}>
                     <Text style={styles.testValue}>{value}</Text>
-                    <Text style={styles.expandIcon}>{expandedItems[key] ? '-' : '+'}</Text>
+                    <Text style={styles.expandIcon}>
+                      {expandedItems[key] ? "-" : "+"}
+                    </Text>
                   </View>
                 </TouchableOpacity>
 
@@ -353,90 +363,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
-  detailHeader: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-    textAlign: "center",
-  },
-  backButton: {
-    width: 100,
-  },
-  detailsList: {
-    padding: 15,
-  },
-  testSection: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  testTitleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-  },
-  testTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#007AFF",
-  },
-  testValue: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  articleResults: {
-    marginTop: 5,
-  },
-  articleResult: {
-    backgroundColor: "#f8f8f8",
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 4,
-  },
-  articleName: {
-    fontSize: 14,
-    color: "#666",
-    fontStyle: "italic",
-    marginBottom: 6,
-  },
-  resultDetails: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  statusText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  referenceText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  emptyText: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "#666",
-    marginTop: 20,
-  },
-  detailsHeader: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
   backButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -455,11 +381,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-  detailHeaderText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-  },
   ageContainer: {
     marginTop: 8,
     paddingTop: 8,
@@ -471,6 +392,81 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
   },
+  testSection: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 12,
+    marginTop: 10,
+    marginHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  testTitleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 5,
+  },
+  testTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#007AFF",
+  },
+  testValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  valueWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  expandIcon: {
+    fontSize: 16,
+    color: "#666",
+    marginLeft: 8,
+  },
+  articleResults: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  articleResult: {
+    backgroundColor: "#f8f8f8",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 4,
+  },
+  articleName: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 8,
+  },
+  resultDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  statusText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  referenceText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  emptyText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#666",
+    marginTop: 20,
+  },
   guideDetailsContainer: {
     flex: 1,
     padding: 15,
@@ -478,46 +474,12 @@ const styles = StyleSheet.create({
   },
   ageGroupText: {
     fontSize: 12,
-    color: "#888",
+    color: "#666",
+    marginTop: 4,
+  },
+  trendText: {
+    fontSize: 14,
+    color: "#007AFF",
     marginTop: 5,
   },
-  valueWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  expandIcon: {
-    fontSize: 16,
-    color: '#666',
-    marginLeft: 8,
-  },
-  articleResults: {
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  articleResult: {
-    backgroundColor: '#f8f8f8',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 4,
-  },
-  articleName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
-  },
-  resultDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  ageGroupText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  }
 });
