@@ -11,7 +11,6 @@ import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { calculateAgeAtDate, getAgeGroup } from "../../utils/ageCalculations";
-import CustomButton from "../../components/CustomButton";
 
 export default function TestHistoryScreen() {
   const { user } = useAuth();

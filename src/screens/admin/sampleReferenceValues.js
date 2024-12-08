@@ -13,7 +13,7 @@ import { doc, setDoc } from "firebase/firestore";
 
 const sampleReferenceValues = {
       article1: {
-        name: "TÜBİTAK",
+        name: "kilavuz-turkjmedsci",
         values: {
           IgA: {
               '0-30 days': { min: 6.67, max: 8.75 },

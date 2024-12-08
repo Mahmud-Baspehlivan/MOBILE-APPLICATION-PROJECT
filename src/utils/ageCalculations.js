@@ -29,7 +29,7 @@ export const calculateAgeAtDate = (birthDate, testDate) => {
 };
 
 const AGE_GROUP_MAPPINGS = {
-  TÜBİTAK: {
+  "kilavuz-turkjmedsci": {
     ranges: [
       { max: 1, group: "0-30 days" },
       { max: 3, group: "1-3 months" },
