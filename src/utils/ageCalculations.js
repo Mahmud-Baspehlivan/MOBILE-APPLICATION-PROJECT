@@ -97,7 +97,7 @@ const AGE_GROUP_MAPPINGS = {
       { max: 12, group: "7-12 months" },
       { max: 24, group: "13-24 months" },
       { max: 36, group: "25-36 months" },
-      { max: 60, group: "3-5 years" },
+      { max: 60, group: "4-5 years" },
       { max: 96, group: "6-8 years" },
       { max: 132, group: "9-11 years" },
       { max: 192, group: "12-16 years" },

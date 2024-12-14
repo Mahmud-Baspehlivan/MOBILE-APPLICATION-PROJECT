@@ -644,27 +644,27 @@ const sampleReferenceValues = {
           geoMean: { value: 0.542, sd: 0.1604 },
           confidenceInterval: [0.0229, 1.1923],
         },
-        "3-5 years": {
+        "4-5 years": {
           // ONEMLI NOT: Normalde 4-5 yas ama referansta bosluk oldugu icin 3-5 yas olarak alindi.
           min: 0.55,
           max: 1.35,
           geoMean: { value: 0.9435, sd: 0.209 },
           confidenceInterval: [0.1324, 1.4916],
         },
-        "5-8 years": {
+        "6-8 years": {
           // ONEMLI NOT: Normalde 6-8 yas ama referansta bosluk oldugu icin 5-8 yas olarak alindi.
           min: 0.81,
           max: 2.64,
           geoMean: { value: 1.3025, sd: 0.4741 },
           confidenceInterval: [0.2973, 1.8463],
         },
-        "8-11 years": {
+        "9-11 years": {
           min: 0.78,
           max: 3.34,
           geoMean: { value: 1.6045, sd: 0.7056 },
           confidenceInterval: [0.5267, 2.2655],
         },
-        "11-16 years": {
+        "12-16 years": {
           min: 0.87,
           max: 2.34,
           geoMean: { value: 1.6364, sd: 0.4958 },
@@ -702,25 +702,25 @@ const sampleReferenceValues = {
           geoMean: { value: 1.0045, sd: 0.2558 },
           confidenceInterval: [0.3187, 1.6104],
         },
-        "3-5 years": {
+        "4-5 years": {
           min: 0.65,
           max: 2.05,
           geoMean: { value: 1.211, sd: 0.3733 },
           confidenceInterval: [0.3537, 1.8164],
         },
-        "5-8 years": {
+        "6-8 years": {
           min: 0.47,
           max: 1.98,
           geoMean: { value: 1.1815, sd: 0.3949 },
           confidenceInterval: [0.3661, 1.9998],
         },
-        "8-11 years": {
+        "9-11 years": {
           min: 0.38,
           max: 1.63,
           geoMean: { value: 1.022, sd: 0.3658 },
           confidenceInterval: [0.3521, 2.1567],
         },
-        "11-16 years": {
+        "12-16 years": {
           min: 0.47,
           max: 2.85,
           geoMean: { value: 1.436, sd: 0.5771 },
@@ -758,7 +758,7 @@ const sampleReferenceValues = {
           geoMean: { value: 8.3475, sd: 1.9352 },
           confidenceInterval: [4.197, 12.6189],
         },
-        "3-5 years": {
+        "4-5 years": {
           min: 5.24,
           max: 14,
           geoMean: { value: 9.944, sd: 2.3668 },
@@ -770,13 +770,13 @@ const sampleReferenceValues = {
           geoMean: { value: 11.6275, sd: 2.2785 },
           confidenceInterval: [5.9234, 15.3992],
         },
-        "8-11 years": {
+        "9-11 years": {
           min: 6.45,
           max: 15.2,
           geoMean: { value: 11.771, sd: 2.4822 },
           confidenceInterval: [6.7313, 16.7342],
         },
-        "11-16 years": {
+        "12-16 years": {
           min: 8.77,
           max: 16.2,
           geoMean: { value: 12.1395, sd: 2.2963 },
