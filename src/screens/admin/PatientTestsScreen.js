@@ -160,16 +160,16 @@ export default function PatientTestsScreen() {
 
     return (
       <View style={styles.articleResult}>
-        {reference.min && (
-        <View style={styles.statusRow}>
-          <Text style={[styles.statusIcon, { color: status.color }]}>
-            {status.icon}
-          </Text>
-          <Text style={styles.statLabel}>Min Max:</Text>
-          <Text style={styles.statValue}>
-            {reference.min} - {reference.max}
-          </Text>
-        </View>
+        {reference.max && (
+          <View style={styles.statusRow}>
+            <Text style={[styles.statusIcon, { color: status.color }]}>
+              {status.icon}
+            </Text>
+            <Text style={styles.statLabel}>Min Max:</Text>
+            <Text style={styles.statValue}>
+              {reference.min} - {reference.max}
+            </Text>
+          </View>
         )}
         {reference.geoMean && (
           <View style={styles.statRow}>
