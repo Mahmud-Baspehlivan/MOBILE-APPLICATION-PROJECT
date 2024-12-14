@@ -155,6 +155,62 @@ export default function PatientTestsScreen() {
     );
   };
 
+  const renderReferenceDetails = (articleResult) => {
+    const { reference, status } = articleResult;
+
+    return (
+      <View style={styles.articleResult}>
+        {reference.min && (
+        <View style={styles.statusRow}>
+          <Text style={[styles.statusIcon, { color: status.color }]}>
+            {status.icon}
+          </Text>
+          <Text style={styles.statLabel}>Min Max:</Text>
+          <Text style={styles.statValue}>
+            {reference.min} - {reference.max}
+          </Text>
+        </View>
+        )}
+        {reference.geoMean && (
+          <View style={styles.statRow}>
+            <Text style={[styles.statusIcon, { color: status.color }]}>
+              {status.icon}
+            </Text>
+            <Text style={styles.statLabel}>Geometrik ort:</Text>
+            <Text style={styles.statValue}>
+              {(reference.geoMean.value - reference.geoMean.sd).toFixed(2)} -{" "}
+              {(reference.geoMean.value + reference.geoMean.sd).toFixed(2)}
+            </Text>
+          </View>
+        )}
+        {reference.mean && (
+          <View style={styles.statRow}>
+            <Text style={[styles.statusIcon, { color: status.color }]}>
+              {status.icon}
+            </Text>
+            <Text style={styles.statLabel}>Ortalama:</Text>
+            <Text style={styles.statValue}>
+              {(reference.mean.value - reference.mean.sd).toFixed(2)} -{" "}
+              {(reference.mean.value + reference.mean.sd).toFixed(2)}
+            </Text>
+          </View>
+        )}
+        {reference.confidenceInterval && (
+          <View style={styles.statRow}>
+            <Text style={[styles.statusIcon, { color: status.color }]}>
+              {status.icon}
+            </Text>
+            <Text style={styles.statLabel}>Confidence:</Text>
+            <Text style={styles.statValue}>
+              {reference.confidenceInterval[0].toFixed(2)} -{" "}
+              {reference.confidenceInterval[1].toFixed(2)}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   const renderTestDetails = () => {
     if (!selectedTest) return null;
 
@@ -162,13 +218,8 @@ export default function PatientTestsScreen() {
       selectedUserData.birthDate,
       selectedTest.date
     );
-    let ageText;
-    if (age.years < 3) {
-      const totalMonths = age.years * 12 + age.months;
-      ageText = `${totalMonths} ay`;
-    } else {
-      ageText = `${age.years} yaş`;
-    }
+    let ageText =
+      age.years < 3 ? `${age.years * 12 + age.months} ay` : `${age.years} yaş`;
 
     const testOrder = ["IgA", "IgM", "IgG", "IgG1", "IgG2", "IgG3", "IgG4"];
 
@@ -200,14 +251,12 @@ export default function PatientTestsScreen() {
             const value = selectedTest.values[key];
             if (!value) return null;
 
-            // Bir önceki tahlil değerini bul
             const currentIndex = tests.findIndex(
               (test) => test.id === selectedTest.id
             );
             const previousTest = tests[currentIndex + 1];
             const previousValue = previousTest?.values[key];
 
-            // Artış/Azalış durumunu belirle
             let trend = null;
             if (previousValue !== undefined) {
               if (value > previousValue) trend = "Artmış";
@@ -232,9 +281,7 @@ export default function PatientTestsScreen() {
                 >
                   <Text style={styles.testTitle}>{key}</Text>
                   <View style={styles.valueWrapper}>
-                    {trend && (
-                      <Text style={styles.trendText}>{`${trend}`}</Text>
-                    )}
+                    {trend && <Text style={styles.trendText}>{trend}</Text>}
                     <Text style={styles.testValue}>{value}</Text>
                     <Text style={styles.expandIcon}>
                       {expandedItems[key] ? "-" : "+"}
@@ -250,18 +297,7 @@ export default function PatientTestsScreen() {
                           {result.articleName}
                         </Text>
                         <View style={styles.resultDetails}>
-                          <Text
-                            style={[
-                              styles.statusText,
-                              { color: result.status.color },
-                            ]}
-                          >
-                            {result.status.icon}
-                          </Text>
-                          <Text style={styles.referenceText}>
-                            Referans: {result.reference.min} -{" "}
-                            {result.reference.max}
-                          </Text>
+                          {renderReferenceDetails(result)}
                         </View>
                         <Text style={styles.ageGroupText}>
                           Yaş Grubu: {result.ageGroup}
@@ -508,7 +544,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     color: "#333",
-    marginBottom: 8,
   },
   resultDetails: {
     flexDirection: "row",
@@ -571,5 +606,38 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#999",
     marginTop: 10,
+  },
+  referenceDetails: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  statRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: "#666",
+    marginRight: 8,
+  },
+  statValue: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "500",
+  },
+  referenceLabel: {
+    fontSize: 14,
+    color: "#666",
+  },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  statusIcon: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginRight: 8,
   },
 });

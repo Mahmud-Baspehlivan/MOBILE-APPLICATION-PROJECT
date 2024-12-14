@@ -16,6 +16,7 @@ import TestHistoryScreen from "../screens/user/TestHistoryScreen";
 import ReferenceValuesScreen from "../screens/admin/ReferenceValuesScreen";
 import TestEntryScreen from "../screens/admin/TestEntryScreen";
 import PatientTestsScreen from "../screens/admin/PatientTestsScreen";
+import sampleReferenceValues from "../screens/admin/sampleReferenceValues";
 
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -82,6 +83,16 @@ function AdminTabs() {
           ),
         }}
       />
+      {/* <Tab.Screen
+        name="ReferenceValuesAdd"
+        component={sampleReferenceValues}
+        options={{
+          title: "Referans Değerler",
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="list-alt" color={color} size={size} />
+          ),
+        }}
+      /> */}
       <Tab.Screen
         name="TestEntry"
         component={TestEntryScreen}
