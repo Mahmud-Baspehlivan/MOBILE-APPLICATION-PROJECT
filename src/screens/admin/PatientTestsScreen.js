@@ -111,9 +111,9 @@ export default function PatientTestsScreen() {
           const meanMin = reference.mean.value - reference.mean.sd;
           const meanMax = reference.mean.value + reference.mean.sd;
           return status[
-            value < geoMeanMin
+            value < meanMin
               ? "low"
-              : value > geoMeanMax
+              : value > meanMax
               ? "high"
               : "normal"
           ]; 
