@@ -88,9 +88,59 @@ export default function PatientTestsScreen() {
     }
   };
 
+  const getStatusForValue = (value, reference, type) => {
+    const status = {
+      low: { status: "low", icon: "↓", color: "#ff3b30" },
+      high: { status: "high", icon: "↑", color: "#ff9500" },
+      normal: { status: "normal", icon: "↔", color: "#34c759" },
+    };
+  
+    switch (type) {
+      case 'geoMean':
+        const geoMeanMin = reference.geoMean.value - reference.geoMean.sd;
+        const geoMeanMax = reference.geoMean.value + reference.geoMean.sd;
+        return status[
+          value < geoMeanMin
+            ? "low"
+            : value > geoMeanMax
+            ? "high"
+            : "normal"
+        ];
+
+        case 'mean':
+          const meanMin = reference.mean.value - reference.mean.sd;
+          const meanMax = reference.mean.value + reference.mean.sd;
+          return status[
+            value < geoMeanMin
+              ? "low"
+              : value > geoMeanMax
+              ? "high"
+              : "normal"
+          ]; 
+      
+      case 'confidence':
+        return status[
+          value < reference.confidenceInterval[0]
+            ? "low"
+            : value > reference.confidenceInterval[1]
+            ? "high"
+            : "normal"
+        ];
+      
+      default: // min-max için
+        return status[
+          value < reference.min
+            ? "low"
+            : value > reference.max
+            ? "high"
+            : "normal"
+        ];
+    }
+  };
+
   const getTestStatusForAllArticles = (value, testType, testDate) => {
     if (!referenceValues || !selectedUserData?.birthDate) return null;
-
+  
     const results = [];
     for (const [articleId, article] of Object.entries(referenceValues)) {
       if (article.values[testType]) {
@@ -101,24 +151,30 @@ export default function PatientTestsScreen() {
           article.name
         );
         const reference = article.values[testType]?.[ageGroup];
-
+  
         if (reference) {
-          const status = {
-            low: { status: "low", icon: "↓", color: "#ff3b30" },
-            high: { status: "high", icon: "↑", color: "#ff9500" },
-            normal: { status: "normal", icon: "↔", color: "#34c759" },
-          }[
-            value < reference.min
-              ? "low"
-              : value > reference.max
-              ? "high"
-              : "normal"
-          ];
-
+          // min-max için status
+          const minMaxStatus = getStatusForValue(value, reference, 'minMax');
+          // geoMean için status
+          const geoMeanStatus = reference.geoMean 
+            ? getStatusForValue(value, reference, 'geoMean')
+            : null;
+          // mean için status
+          const meanStatus = reference.geoMean 
+            ? getStatusForValue(value, reference, 'geoMean')
+            : null;  
+          // confidence için status
+          const confidenceStatus = reference.confidenceInterval 
+            ? getStatusForValue(value, reference, 'confidence')
+            : null;
+  
           results.push({
             articleName: article.name,
             reference,
-            status,
+            status: minMaxStatus,
+            geoMeanStatus,
+            meanStatus,
+            confidenceStatus,
             ageGroup,
           });
         }
@@ -156,11 +212,11 @@ export default function PatientTestsScreen() {
   };
 
   const renderReferenceDetails = (articleResult) => {
-    const { reference, status } = articleResult;
-
+    const { reference, status, geoMeanStatus, meanStatus, confidenceStatus } = articleResult;
+  
     return (
       <View style={styles.articleResult}>
-        {reference.max && (
+        {reference.min && (
           <View style={styles.statusRow}>
             <Text style={[styles.statusIcon, { color: status.color }]}>
               {status.icon}
@@ -173,8 +229,8 @@ export default function PatientTestsScreen() {
         )}
         {reference.geoMean && (
           <View style={styles.statRow}>
-            <Text style={[styles.statusIcon, { color: status.color }]}>
-              {status.icon}
+            <Text style={[styles.statusIcon, { color: geoMeanStatus?.color }]}>
+              {geoMeanStatus?.icon}
             </Text>
             <Text style={styles.statLabel}>Geometrik ort:</Text>
             <Text style={styles.statValue}>
@@ -185,8 +241,8 @@ export default function PatientTestsScreen() {
         )}
         {reference.mean && (
           <View style={styles.statRow}>
-            <Text style={[styles.statusIcon, { color: status.color }]}>
-              {status.icon}
+            <Text style={[styles.statusIcon, { color: meanStatus?.color }]}>
+              {meanStatus?.icon}
             </Text>
             <Text style={styles.statLabel}>Ortalama:</Text>
             <Text style={styles.statValue}>
@@ -197,8 +253,8 @@ export default function PatientTestsScreen() {
         )}
         {reference.confidenceInterval && (
           <View style={styles.statRow}>
-            <Text style={[styles.statusIcon, { color: status.color }]}>
-              {status.icon}
+            <Text style={[styles.statusIcon, { color: confidenceStatus?.color }]}>
+              {confidenceStatus?.icon}
             </Text>
             <Text style={styles.statLabel}>Confidence:</Text>
             <Text style={styles.statValue}>
