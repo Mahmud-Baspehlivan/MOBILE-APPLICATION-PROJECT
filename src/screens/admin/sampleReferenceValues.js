@@ -65,21 +65,22 @@ const sampleReferenceValues = {
           mean: { value: 0.6898, sd: 0.3405 },
           confidenceInterval: [0.5627, 0.817],
         },
-        "6-8 years": {
+        // ONEMLI NOT: Normalde 6-8 yas ama referansta bosluk oldugu icin 5-8 yas olarak alindi.
+        "5-8 years": {
           min: 0.448,
           max: 2.76,
           geoMean: { value: 0.9738, sd: 0.4966 },
           mean: { value: 1.069, sd: 0.4966 },
           confidenceInterval: [0.8836, 1.2545],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.326,
           max: 2.62,
           geoMean: { value: 1.0227, sd: 0.4705 },
           mean: { value: 1.1599, sd: 0.4705 },
           confidenceInterval: [0.9469, 1.3729],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 0.364,
           max: 3.05,
           geoMean: { value: 1.1216, sd: 0.4751 },
@@ -144,21 +145,21 @@ const sampleReferenceValues = {
           mean: { value: 1.2179, sd: 0.3924 },
           confidenceInterval: [1.0713, 1.3644],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 0.503,
           max: 2.42,
           geoMean: { value: 1.0805, sd: 0.4127 },
           mean: { value: 1.1473, sd: 0.4127 },
           confidenceInterval: [0.9932, 1.3014],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.374,
           max: 2.13,
           geoMean: { value: 1.0495, sd: 0.4368 },
           mean: { value: 1.1318, sd: 0.4368 },
           confidenceInterval: [0.9687, 1.2949],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 0.424,
           max: 1.97,
           geoMean: { value: 1.1916, sd: 0.3931 },
@@ -223,21 +224,21 @@ const sampleReferenceValues = {
           mean: { value: 8.3987, sd: 1.6419 },
           confidenceInterval: [7.7856, 9.0118],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 4.83,
           max: 15.8,
           geoMean: { value: 9.8286, sd: 2.5553 },
           mean: { value: 10.1493, sd: 2.5553 },
           confidenceInterval: [9.1952, 11.1035],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 6.42,
           max: 22.9,
           geoMean: { value: 10.1612, sd: 3.2227 },
           mean: { value: 10.5543, sd: 3.2227 },
           confidenceInterval: [9.3509, 11.7577],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 6.36,
           max: 16.1,
           geoMean: { value: 11.2356, sd: 2.0383 },
@@ -267,21 +268,21 @@ const sampleReferenceValues = {
           mean: { value: 5.1393, sd: 0.8228 },
           confidenceInterval: [4.832, 5.4465],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 2.92,
           max: 7.81,
           geoMean: { value: 5.6794, sd: 1.2164 },
           mean: { value: 5.81, sd: 1.2164 },
           confidenceInterval: [5.3587, 6.2672],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 4.1,
           max: 15.3,
           geoMean: { value: 6.3417, sd: 2.1639 },
           mean: { value: 6.6023, sd: 2.1639 },
           confidenceInterval: [5.7943, 7.4103],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 3.44,
           max: 9.58,
           geoMean: { value: 6.3552, sd: 1.3101 },
@@ -311,21 +312,21 @@ const sampleReferenceValues = {
           mean: { value: 1.5195, sd: 0.508 },
           confidenceInterval: [1.3298, 1.7092],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 0.881,
           max: 4.08,
           geoMean: { value: 1.9657, sd: 0.8641 },
           mean: { value: 2.1367, sd: 0.8641 },
           confidenceInterval: [1.814, 2.4593],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.81,
           max: 4.42,
           geoMean: { value: 2.5067, sd: 0.8572 },
           mean: { value: 2.6556, sd: 0.8572 },
           confidenceInterval: [2.3355, 2.9757],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 1.59,
           max: 4.06,
           geoMean: { value: 2.6162, sd: 0.6914 },
@@ -355,21 +356,21 @@ const sampleReferenceValues = {
           mean: { value: 0.4526, sd: 0.2155 },
           confidenceInterval: [0.3721, 0.533],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 0.189,
           max: 1.35,
           geoMean: { value: 0.5682, sd: 0.3055 },
           mean: { value: 0.6553, sd: 0.3055 },
           confidenceInterval: [0.5301, 0.7806],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.341,
           max: 2,
           geoMean: { value: 0.7759, sd: 0.3737 },
           mean: { value: 0.8419, sd: 0.3737 },
           confidenceInterval: [0.7024, 0.9815],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 0.352,
           max: 1.5,
           geoMean: { value: 0.753, sd: 0.3186 },
@@ -399,21 +400,21 @@ const sampleReferenceValues = {
           mean: { value: 0.4075, sd: 0.1542 },
           confidenceInterval: [0.2884, 0.5265],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 0.0786,
           max: 1.57,
           geoMean: { value: 0.3933, sd: 0.2305 },
           mean: { value: 0.5094, sd: 0.2305 },
           confidenceInterval: [0.3711, 0.6477],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.0786,
           max: 0.938,
           geoMean: { value: 0.2536, sd: 0.1539 },
           mean: { value: 0.3551, sd: 0.1539 },
           confidenceInterval: [0.2495, 0.4607],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 0.0786,
           max: 1.19,
           geoMean: { value: 0.3103, sd: 0.1673 },
@@ -644,27 +645,27 @@ const sampleReferenceValues = {
           geoMean: { value: 0.542, sd: 0.1604 },
           confidenceInterval: [0.0229, 1.1923],
         },
-        "4-5 years": {
+        "3-5 years": {
           // ONEMLI NOT: Normalde 4-5 yas ama referansta bosluk oldugu icin 3-5 yas olarak alindi.
           min: 0.55,
           max: 1.35,
           geoMean: { value: 0.9435, sd: 0.209 },
           confidenceInterval: [0.1324, 1.4916],
         },
-        "6-8 years": {
+        "5-8 years": {
           // ONEMLI NOT: Normalde 6-8 yas ama referansta bosluk oldugu icin 5-8 yas olarak alindi.
           min: 0.81,
           max: 2.64,
           geoMean: { value: 1.3025, sd: 0.4741 },
           confidenceInterval: [0.2973, 1.8463],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.78,
           max: 3.34,
           geoMean: { value: 1.6045, sd: 0.7056 },
           confidenceInterval: [0.5267, 2.2655],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 0.87,
           max: 2.34,
           geoMean: { value: 1.6364, sd: 0.4958 },
@@ -702,25 +703,25 @@ const sampleReferenceValues = {
           geoMean: { value: 1.0045, sd: 0.2558 },
           confidenceInterval: [0.3187, 1.6104],
         },
-        "4-5 years": {
+        "3-5 years": {
           min: 0.65,
           max: 2.05,
           geoMean: { value: 1.211, sd: 0.3733 },
           confidenceInterval: [0.3537, 1.8164],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 0.47,
           max: 1.98,
           geoMean: { value: 1.1815, sd: 0.3949 },
           confidenceInterval: [0.3661, 1.9998],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 0.38,
           max: 1.63,
           geoMean: { value: 1.022, sd: 0.3658 },
           confidenceInterval: [0.3521, 2.1567],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 0.47,
           max: 2.85,
           geoMean: { value: 1.436, sd: 0.5771 },
@@ -758,25 +759,25 @@ const sampleReferenceValues = {
           geoMean: { value: 8.3475, sd: 1.9352 },
           confidenceInterval: [4.197, 12.6189],
         },
-        "4-5 years": {
+        "3-5 years": {
           min: 5.24,
           max: 14,
           geoMean: { value: 9.944, sd: 2.3668 },
           confidenceInterval: [5.0768, 14.0257],
         },
-        "6-8 years": {
+        "5-8 years": {
           min: 8.58,
           max: 16,
           geoMean: { value: 11.6275, sd: 2.2785 },
           confidenceInterval: [5.9234, 15.3992],
         },
-        "9-11 years": {
+        "8-11 years": {
           min: 6.45,
           max: 15.2,
           geoMean: { value: 11.771, sd: 2.4822 },
           confidenceInterval: [6.7313, 16.7342],
         },
-        "12-16 years": {
+        "11-16 years": {
           min: 8.77,
           max: 16.2,
           geoMean: { value: 12.1395, sd: 2.2963 },
