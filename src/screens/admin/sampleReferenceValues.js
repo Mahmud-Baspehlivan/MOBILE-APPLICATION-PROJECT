@@ -838,31 +838,31 @@ const sampleReferenceValues = {
           geoMean: { value: 0.919, sd: 0.374 },
           confidenceInterval: [0.902, 1.083],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 0.361,
           max: 2.68,
           geoMean: { value: 1.084, sd: 0.423 },
           confidenceInterval: [1.059, 1.27],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 0.54,
           max: 2.68,
           geoMean: { value: 1.167, sd: 0.459 },
           confidenceInterval: [1.118, 1.37],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 0.27,
           max: 1.98,
           geoMean: { value: 1.158, sd: 0.43 },
           confidenceInterval: [1.097, 1.413],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 0.524,
           max: 2.25,
           geoMean: { value: 1.305, sd: 0.474 },
           confidenceInterval: [1.18, 1.59],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 0.48,
           max: 1.58,
           geoMean: { value: 1.098, sd: 0.294 },
@@ -924,31 +924,31 @@ const sampleReferenceValues = {
           geoMean: { value: 0.976, sd: 0.429 },
           confidenceInterval: [0.955, 1.168],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 0.305,
           max: 2.2,
           geoMean: { value: 0.939, sd: 0.456 },
           confidenceInterval: [0.86, 1.24],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 0.24,
           max: 1.87,
           geoMean: { value: 1.024, sd: 0.388 },
           confidenceInterval: [0.968, 1.24],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 0.264,
           max: 1.8,
           geoMean: { value: 0.983, sd: 0.43 },
           confidenceInterval: [0.963, 1.177],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 0.302,
           max: 2.2,
           geoMean: { value: 0.974, sd: 0.423 },
           confidenceInterval: [0.906, 1.24],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 0.485,
           max: 2.5,
           geoMean: { value: 1.047, sd: 0.448 },
@@ -1010,31 +1010,31 @@ const sampleReferenceValues = {
           geoMean: { value: 9.862, sd: 2.096 },
           confidenceInterval: [9.585, 10.585],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 5.27,
           max: 15.9,
           geoMean: { value: 10.407, sd: 2.032 },
           confidenceInterval: [10.115, 11.114],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 6.46,
           max: 16.2,
           geoMean: { value: 10.628, sd: 2.388 },
           confidenceInterval: [10.249, 11.577],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 5.79,
           max: 16.1,
           geoMean: { value: 10.517, sd: 2.289 },
           confidenceInterval: [9.959, 11.556],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 7.41,
           max: 16.5,
           geoMean: { value: 10.878, sd: 2.36 },
           confidenceInterval: [10.142, 12.09],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 6.66,
           max: 13.7,
           geoMean: { value: 9.811, sd: 2.077 },
@@ -1096,31 +1096,31 @@ const sampleReferenceValues = {
           geoMean: { value: 7.55, sd: 2.09 },
           confidenceInterval: [7.34, 9.96],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 4.2,
           max: 14.7,
           geoMean: { value: 8.06, sd: 2.81 },
           confidenceInterval: [7.78, 9.2],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 4.86,
           max: 15.6,
           geoMean: { value: 8.6, sd: 3.29 },
           confidenceInterval: [8.34, 9.96],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 5.99,
           max: 15.6,
           geoMean: { value: 8.42, sd: 2.41 },
           confidenceInterval: [7.87, 9.53],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 4.9,
           max: 15.6,
           geoMean: { value: 8.72, sd: 3.54 },
           confidenceInterval: [8.05, 10.61],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 4.98,
           max: 14.6,
           geoMean: { value: 7.96, sd: 2.69 },
@@ -1182,31 +1182,31 @@ const sampleReferenceValues = {
           geoMean: { value: 1.67, sd: 0.78 },
           confidenceInterval: [1.6, 2.04],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 1.07,
           max: 4.6,
           geoMean: { value: 1.97, sd: 1.01 },
           confidenceInterval: [1.93, 2.45],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 0.7,
           max: 5.43,
           geoMean: { value: 2.14, sd: 1.21 },
           confidenceInterval: [2.11, 2.73],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 1.11,
           max: 5.15,
           geoMean: { value: 2.12, sd: 0.88 },
           confidenceInterval: [1.95, 2.59],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 1,
           max: 5.73,
           geoMean: { value: 2.79, sd: 1.34 },
           confidenceInterval: [2.57, 3.61],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 1.1,
           max: 3.98,
           geoMean: { value: 2.38, sd: 0.83 },
@@ -1268,31 +1268,31 @@ const sampleReferenceValues = {
           geoMean: { value: 0.51, sd: 0.43 },
           confidenceInterval: [0.51, 0.73],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 0.21,
           max: 1.86,
           geoMean: { value: 0.51, sd: 0.34 },
           confidenceInterval: [0.5, 0.67],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 0.28,
           max: 2.2,
           geoMean: { value: 0.53, sd: 0.4 },
           confidenceInterval: [0.47, 0.75],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 0.3,
           max: 1.82,
           geoMean: { value: 0.5, sd: 0.44 },
           confidenceInterval: [0.51, 0.73],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 0.28,
           max: 2.23,
           geoMean: { value: 0.8, sd: 0.56 },
           confidenceInterval: [0.73, 1.17],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 0.3,
           max: 1.2,
           geoMean: { value: 0.58, sd: 0.21 },
@@ -1354,31 +1354,31 @@ const sampleReferenceValues = {
           geoMean: { value: 0.35, sd: 0.46 },
           confidenceInterval: [0.37, 0.62],
         },
-        "7-8 years": {
+        "6-8 years": {
           min: 0.02,
           max: 1.98,
           geoMean: { value: 0.42, sd: 0.46 },
           confidenceInterval: [0.49, 0.72],
         },
-        "9-10 years": {
+        "8-10 years": {
           min: 0.05,
           max: 2.02,
           geoMean: { value: 0.36, sd: 0.45 },
           confidenceInterval: [0.41, 0.63],
         },
-        "11-12 years": {
+        "10-12 years": {
           min: 0.04,
           max: 1.6,
           geoMean: { value: 0.34, sd: 0.44 },
           confidenceInterval: [0.34, 0.64],
         },
-        "13-14 years": {
+        "12-14 years": {
           min: 0.1,
           max: 1.44,
           geoMean: { value: 0.51, sd: 0.45 },
           confidenceInterval: [0.51, 0.84],
         },
-        "15-16 years": {
+        "14-16 years": {
           min: 0.09,
           max: 1.87,
           geoMean: { value: 0.36, sd: 0.44 },
