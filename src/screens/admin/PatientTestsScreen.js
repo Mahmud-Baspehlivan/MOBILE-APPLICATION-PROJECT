@@ -94,31 +94,23 @@ export default function PatientTestsScreen() {
       high: { status: "high", icon: "↑", color: "#ff9500" },
       normal: { status: "normal", icon: "↔", color: "#34c759" },
     };
-  
+
     switch (type) {
-      case 'geoMean':
+      case "geoMean":
         const geoMeanMin = reference.geoMean.value - reference.geoMean.sd;
         const geoMeanMax = reference.geoMean.value + reference.geoMean.sd;
         return status[
-          value < geoMeanMin
-            ? "low"
-            : value > geoMeanMax
-            ? "high"
-            : "normal"
+          value < geoMeanMin ? "low" : value > geoMeanMax ? "high" : "normal"
         ];
 
-        case 'mean':
-          const meanMin = reference.mean.value - reference.mean.sd;
-          const meanMax = reference.mean.value + reference.mean.sd;
-          return status[
-            value < meanMin
-              ? "low"
-              : value > meanMax
-              ? "high"
-              : "normal"
-          ]; 
-      
-      case 'confidence':
+      case "mean":
+        const meanMin = reference.mean.value - reference.mean.sd;
+        const meanMax = reference.mean.value + reference.mean.sd;
+        return status[
+          value < meanMin ? "low" : value > meanMax ? "high" : "normal"
+        ];
+
+      case "confidence":
         return status[
           value < reference.confidenceInterval[0]
             ? "low"
@@ -126,7 +118,7 @@ export default function PatientTestsScreen() {
             ? "high"
             : "normal"
         ];
-      
+
       default: // min-max için
         return status[
           value < reference.min
@@ -140,7 +132,7 @@ export default function PatientTestsScreen() {
 
   const getTestStatusForAllArticles = (value, testType, testDate) => {
     if (!referenceValues || !selectedUserData?.birthDate) return null;
-  
+
     const results = [];
     for (const [articleId, article] of Object.entries(referenceValues)) {
       if (article.values[testType]) {
@@ -151,23 +143,23 @@ export default function PatientTestsScreen() {
           article.name
         );
         const reference = article.values[testType]?.[ageGroup];
-  
+
         if (reference) {
           // min-max için status
-          const minMaxStatus = getStatusForValue(value, reference, 'minMax');
+          const minMaxStatus = getStatusForValue(value, reference, "minMax");
           // geoMean için status
-          const geoMeanStatus = reference.geoMean 
-            ? getStatusForValue(value, reference, 'geoMean')
+          const geoMeanStatus = reference.geoMean
+            ? getStatusForValue(value, reference, "geoMean")
             : null;
           // mean için status
-          const meanStatus = reference.geoMean 
-            ? getStatusForValue(value, reference, 'geoMean')
-            : null;  
-          // confidence için status
-          const confidenceStatus = reference.confidenceInterval 
-            ? getStatusForValue(value, reference, 'confidence')
+          const meanStatus = reference.geoMean
+            ? getStatusForValue(value, reference, "geoMean")
             : null;
-  
+          // confidence için status
+          const confidenceStatus = reference.confidenceInterval
+            ? getStatusForValue(value, reference, "confidence")
+            : null;
+
           results.push({
             articleName: article.name,
             reference,
@@ -212,8 +204,9 @@ export default function PatientTestsScreen() {
   };
 
   const renderReferenceDetails = (articleResult) => {
-    const { reference, status, geoMeanStatus, meanStatus, confidenceStatus } = articleResult;
-  
+    const { reference, status, geoMeanStatus, meanStatus, confidenceStatus } =
+      articleResult;
+
     return (
       <View style={styles.articleResult}>
         {reference.min && (
@@ -253,7 +246,9 @@ export default function PatientTestsScreen() {
         )}
         {reference.confidenceInterval && (
           <View style={styles.statRow}>
-            <Text style={[styles.statusIcon, { color: confidenceStatus?.color }]}>
+            <Text
+              style={[styles.statusIcon, { color: confidenceStatus?.color }]}
+            >
               {confidenceStatus?.icon}
             </Text>
             <Text style={styles.statLabel}>Confidence:</Text>
@@ -349,11 +344,13 @@ export default function PatientTestsScreen() {
                   <View style={styles.articleResults}>
                     {articleResults.map((result, index) => (
                       <View key={index} style={styles.articleResult}>
-                        <Text style={styles.articleName}>
-                          {result.articleName}
-                        </Text>
-                        <View style={styles.resultDetails}>
-                          {renderReferenceDetails(result)}
+                        <View style={styles.referenceRow}>
+                          <Text style={styles.articleName}>
+                            {result.articleName}
+                          </Text>
+                          <Text style={styles.referenceDetails}>
+                            {renderReferenceDetails(result)}
+                          </Text>
                         </View>
                         <Text style={styles.ageGroupText}>
                           Yaş Grubu: {result.ageGroup}
@@ -597,9 +594,8 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   articleName: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#333",
+    flex: 1,
+    fontSize: 14
   },
   resultDetails: {
     flexDirection: "row",
@@ -664,8 +660,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   referenceDetails: {
-    flex: 1,
-    marginLeft: 10,
+    textAlign: 'right',
+    fontSize: 14
   },
   statRow: {
     flexDirection: "row",
@@ -695,5 +691,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginRight: 8,
+  },
+  referenceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    width: '100%'
   },
 });
