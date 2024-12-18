@@ -19,8 +19,10 @@ export default function ReferenceValuesUploadScreen() {
   const [selectedTest, setSelectedTest] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [selectedAge, setSelectedAge] = useState("");
-  const [ageUnit, setAgeUnit] = useState("months"); // Eklenen kısım
+  const [ageUnit, setAgeUnit] = useState("months");
   const [result, setResult] = useState(null);
+  const [showGuidelines, setShowGuidelines] = useState(false);
+  const [selectedGuidelineTest, setSelectedGuidelineTest] = useState(null);
 
   const testTypes = ["IgA", "IgM", "IgG", "IgG1", "IgG2", "IgG3", "IgG4"];
 
@@ -133,8 +135,8 @@ export default function ReferenceValuesUploadScreen() {
       try {
         const result = {
           range: matchingRange,
-          min: matchingValues.min, 
-          max: matchingValues.max, 
+          min: matchingValues.min,
+          max: matchingValues.max,
           value: value,
           status:
             value < (matchingValues.min ?? 0)
@@ -214,174 +216,263 @@ export default function ReferenceValuesUploadScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.articleButtons}>
-        {referenceValues &&
-          Object.entries(referenceValues).map(([articleId, articleData]) => (
-            <TouchableOpacity
-              key={articleId}
-              style={[
-                styles.articleButton,
-                selectedArticle === articleId && styles.selectedArticleButton,
-              ]}
-              onPress={() =>
-                setSelectedArticle(
-                  articleId === selectedArticle ? null : articleId
-                )
-              }
-            >
-              <Text
-                style={[
-                  styles.articleButtonText,
-                  selectedArticle === articleId &&
-                    styles.selectedArticleButtonText,
-                ]}
-              >
-                {articleData.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-      </View>
-
-      {/* Hesaplama Bölümü */}
-      <View style={styles.calculatorContainer}>
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Test Tipi</Text>
-          <Picker
-            selectedValue={selectedTest}
-            onValueChange={(itemValue) => setSelectedTest(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Seçiniz" value="" />
-            {testTypes.map((test) => (
-              <Picker.Item key={test} label={test} value={test} />
-            ))}
-          </Picker>
-        </View>
-
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Değer</Text>
-          <TextInput
-            style={styles.input}
-            value={inputValue}
-            onChangeText={setInputValue}
-            keyboardType="numeric"
-            placeholder="Değer giriniz"
-          />
-        </View>
-
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Yaş</Text>
-          <View style={styles.ageInputContainer}>
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              value={selectedAge}
-              onChangeText={setSelectedAge}
-              keyboardType="numeric"
-              placeholder="Yaş giriniz"
-            />
-            <Picker
-              selectedValue={ageUnit}
-              onValueChange={(itemValue) => setAgeUnit(itemValue)}
-              style={styles.ageUnitPicker}
-            >
-              <Picker.Item label="Ay" value="months" />
-              <Picker.Item label="Yıl" value="years" />
-            </Picker>
-          </View>
-        </View>
-
+      <View style={styles.header}>
         <TouchableOpacity
-          style={styles.calculateButton}
-          onPress={calculateResult}
+          style={styles.viewToggleButton}
+          onPress={() => setShowGuidelines(!showGuidelines)}
         >
-          <Text style={styles.calculateButtonText}>Hesapla</Text>
-        </TouchableOpacity>
-
-        {result && (
-          <View style={styles.resultContainer}>
-            <Text style={styles.resultTitle}>Sonuç</Text>
-            <Text style={styles.resultText}>Yaş Aralığı: {result.range}</Text>
-            <Text style={styles.resultText}>
-              Min: {result.min?.toFixed(3) ?? "Mevcut değil"}
-            </Text>
-            <Text style={styles.resultText}>
-              Max: {result.max?.toFixed(3) ?? "Mevcut değil"}
-            </Text>
-
-            {/* Geometric Mean kontrolü */}
-            <Text style={styles.resultText}>
-              Geometric Mean:{" "}
-              {result.geoMean
-                ? typeof result.geoMean === "object"
-                  ? `${(result.geoMean.value - result.geoMean.sd).toFixed(
-                      3
-                    )} - ${(result.geoMean.value + result.geoMean.sd).toFixed(
-                      3
-                    )}`
-                  : result.geoMean.toFixed(3)
-                : "Mevcut değil"}
-            </Text>
-
-            {/* Mean kontrolü */}
-            <Text style={styles.resultText}>
-              Mean:{" "}
-              {result.mean
-                ? typeof result.mean === "object"
-                  ? `${(result.mean.value - result.mean.sd).toFixed(3)} - ${(
-                      result.mean.value + result.mean.sd
-                    ).toFixed(3)}`
-                  : result.mean.toFixed(3)
-                : "Mevcut değil"}
-            </Text>
-
-            <Text style={styles.resultText}>
-              Confidence: {result.confidence}
-            </Text>
-
-            <Text
-              style={[
-                styles.resultText,
-                styles.statusText,
-                result.status === "Düşük" && styles.lowStatus,
-                result.status === "Yüksek" && styles.highStatus,
-                result.status === "Normal" && styles.normalStatus,
-              ]}
-            >
-              Durum: {result.status}
-            </Text>
-          </View>
-        )}
-      </View>
-      {/* {selectedArticle && referenceValues && (
-        <View style={styles.valuesContainer}>
-          <Text style={styles.selectedArticleTitle}>
-            {referenceValues[selectedArticle].name}
+          <Text style={styles.viewToggleButtonText}>
+            {showGuidelines ? "Hesaplama Tablosu" : "Kılavuz Görünümü"}
           </Text>
+        </TouchableOpacity>
+      </View>
 
-          {Object.entries(referenceValues[selectedArticle].values)
-            .sort(([keyA], [keyB]) => {
-              // Test sıralamasına göre sıralama
-              const indexA = testOrder.indexOf(keyA);
-              const indexB = testOrder.indexOf(keyB);
-              return indexA - indexB;
-            })
-            .map(([testType, ageGroups]) => (
-              <View key={testType} style={styles.testTypeSection}>
-                <Text style={styles.testTypeTitle}>{testType}</Text>
-                {Object.entries(ageGroups)
-                  .sort(([ageA], [ageB]) => sortAgeRanges(ageA, ageB)) // Yaş aralıklarını sıralama
-                  .map(([ageRange, values]) => (
-                    <View key={ageRange} style={styles.rangeRow}>
-                      <Text style={styles.ageRangeText}>{ageRange}</Text>
-                      <Text style={styles.valuesText}>
-                        Min: {values.min.toFixed(3)} - Max: {values.max.toFixed(3)}
-                      </Text>
-                    </View>
-                  ))}
+      {!showGuidelines ? (
+        <>
+          <View style={styles.articleButtons}>
+            {referenceValues &&
+              Object.entries(referenceValues).map(
+                ([articleId, articleData]) => (
+                  <TouchableOpacity
+                    key={articleId}
+                    style={[
+                      styles.articleButton,
+                      selectedArticle === articleId &&
+                        styles.selectedArticleButton,
+                    ]}
+                    onPress={() =>
+                      setSelectedArticle(
+                        articleId === selectedArticle ? null : articleId
+                      )
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.articleButtonText,
+                        selectedArticle === articleId &&
+                          styles.selectedArticleButtonText,
+                      ]}
+                    >
+                      {articleData.name}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              )}
+          </View>
+
+          {/* Hesaplama Bölümü */}
+          <View style={styles.calculatorContainer}>
+            <View style={styles.pickerContainer}>
+              <Text style={styles.pickerLabel}>Test Tipi</Text>
+              <Picker
+                selectedValue={selectedTest}
+                onValueChange={(itemValue) => setSelectedTest(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Seçiniz" value="" />
+                {testTypes.map((test) => (
+                  <Picker.Item key={test} label={test} value={test} />
+                ))}
+              </Picker>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <Text style={styles.pickerLabel}>Değer</Text>
+              <TextInput
+                style={styles.input}
+                value={inputValue}
+                onChangeText={setInputValue}
+                keyboardType="numeric"
+                placeholder="Değer giriniz"
+              />
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <Text style={styles.pickerLabel}>Yaş</Text>
+              <View style={styles.ageInputContainer}>
+                <TextInput
+                  style={[styles.input, { flex: 1 }]}
+                  value={selectedAge}
+                  onChangeText={setSelectedAge}
+                  keyboardType="numeric"
+                  placeholder="Yaş giriniz"
+                />
+                <Picker
+                  selectedValue={ageUnit}
+                  onValueChange={(itemValue) => setAgeUnit(itemValue)}
+                  style={styles.ageUnitPicker}
+                >
+                  <Picker.Item label="Ay" value="months" />
+                  <Picker.Item label="Yıl" value="years" />
+                </Picker>
               </View>
-            ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.calculateButton}
+              onPress={calculateResult}
+            >
+              <Text style={styles.calculateButtonText}>Hesapla</Text>
+            </TouchableOpacity>
+
+            {result && (
+              <View style={styles.resultContainer}>
+                <Text style={styles.resultTitle}>Sonuç</Text>
+                <Text style={styles.resultText}>
+                  Yaş Aralığı: {result.range}
+                </Text>
+                <Text style={styles.resultText}>
+                  Min: {result.min?.toFixed(3) ?? "Mevcut değil"}
+                </Text>
+                <Text style={styles.resultText}>
+                  Max: {result.max?.toFixed(3) ?? "Mevcut değil"}
+                </Text>
+
+                {/* Geometric Mean kontrolü */}
+                <Text style={styles.resultText}>
+                  Geometrik Ort:{" "}
+                  {result.geoMean
+                    ? typeof result.geoMean === "object"
+                      ? `${(result.geoMean.value - result.geoMean.sd).toFixed(
+                          3
+                        )} - ${(
+                          result.geoMean.value + result.geoMean.sd
+                        ).toFixed(3)}`
+                      : result.geoMean.toFixed(3)
+                    : "Mevcut değil"}
+                </Text>
+
+                {/* Mean kontrolü */}
+                <Text style={styles.resultText}>
+                  Ortalama:{" "}
+                  {result.mean
+                    ? typeof result.mean === "object"
+                      ? `${(result.mean.value - result.mean.sd).toFixed(
+                          3
+                        )} - ${(result.mean.value + result.mean.sd).toFixed(3)}`
+                      : result.mean.toFixed(3)
+                    : "Mevcut değil"}
+                </Text>
+
+                <Text style={styles.resultText}>
+                  Confidence: {result.confidence ?? "Mevcut değil"}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.resultText,
+                    styles.statusText,
+                    result.status === "Düşük" && styles.lowStatus,
+                    result.status === "Yüksek" && styles.highStatus,
+                    result.status === "Normal" && styles.normalStatus,
+                  ]}
+                >
+                  Durum: {result.status}
+                </Text>
+              </View>
+            )}
+          </View>
+        </>
+      ) : (
+        <View style={styles.guidelinesContainer}>
+          <View style={styles.articleButtons}>
+            {referenceValues &&
+              Object.entries(referenceValues).map(
+                ([articleId, articleData]) => (
+                  <TouchableOpacity
+                    key={articleId}
+                    style={[
+                      styles.guidelineArticleButton,
+                      selectedArticle === articleId &&
+                        styles.selectedGuidelineArticleButton,
+                    ]}
+                    onPress={() => {
+                      setSelectedArticle(articleId);
+                      setSelectedGuidelineTest(null); // Reset selected test when article changes
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.guidelineArticleButtonText,
+                        selectedArticle === articleId &&
+                          styles.selectedGuidelineArticleButtonText,
+                      ]}
+                    >
+                      {articleData.name}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              )}
+          </View>
+
+          {selectedArticle && referenceValues && (
+            <View style={styles.valuesContainer}>
+              <Text style={styles.selectedArticleTitle}>
+                {referenceValues[selectedArticle]?.name}
+              </Text>
+              
+              <View style={styles.testTypeButtons}>
+                {testTypes.map((testType) => (
+                  <TouchableOpacity
+                    key={testType}
+                    style={[
+                      styles.testTypeButton,
+                      selectedGuidelineTest === testType && styles.selectedTestTypeButton,
+                    ]}
+                    onPress={() => setSelectedGuidelineTest(testType)}
+                  >
+                    <Text
+                      style={[
+                        styles.testTypeButtonText,
+                        selectedGuidelineTest === testType && styles.selectedTestTypeButtonText,
+                      ]}
+                    >
+                      {testType}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {selectedGuidelineTest && referenceValues[selectedArticle]?.values[selectedGuidelineTest] && (
+                <View style={styles.testTypeSection}>
+                  <Text style={styles.testTypeTitle}>{selectedGuidelineTest}</Text>
+                  {Object.entries(referenceValues[selectedArticle].values[selectedGuidelineTest])
+                    .sort(([ageA], [ageB]) => sortAgeRanges(ageA, ageB))
+                    .map(([ageRange, values]) => (
+                      <View key={ageRange} style={styles.rangeRow}>
+                        <Text style={styles.ageRangeText}>{ageRange}</Text>
+                        <View style={styles.valuesDetailContainer}>
+                          <Text style={styles.valuesText}>
+                            Referans Aralığı: {values.min?.toFixed(2)} - {values.max?.toFixed(2)}
+                          </Text>
+                          {values.mean && (
+                            <Text style={styles.valuesText}>
+                              Ortalama: {typeof values.mean === 'object' 
+                                ? `${values.mean.value?.toFixed(2)} ± ${values.mean.sd?.toFixed(2)}`
+                                : values.mean?.toFixed(2)}
+                            </Text>
+                          )}
+                          {values.geoMean && (
+                            <Text style={styles.valuesText}>
+                              Geometrik Ortalama: {typeof values.geoMean === 'object'
+                                ? `${values.geoMean.value?.toFixed(2)} ± ${values.geoMean.sd?.toFixed(2)}`
+                                : values.geoMean?.toFixed(2)}
+                            </Text>
+                          )}
+                          {values.confidenceInterval && (
+                            <Text style={styles.valuesText}>
+                              Güven Aralığı: {values.confidenceInterval[0]?.toFixed(2)} - {values.confidenceInterval[1]?.toFixed(2)}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    ))}
+                </View>
+              )}
+            </View>
+          )}
         </View>
-      )} */}
+      )}
     </ScrollView>
   );
 }
@@ -498,22 +589,22 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   rangeRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    flexDirection: "column",
+    padding: 10,
     backgroundColor: "#f8f8f8",
-    marginBottom: 4,
+    marginBottom: 8,
     borderRadius: 6,
   },
   ageRangeText: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "bold",
+    marginBottom: 4,
   },
   valuesText: {
     fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
+    color: "#666",
+    marginBottom: 2,
   },
   loadingContainer: {
     flex: 1,
@@ -593,5 +684,164 @@ const styles = StyleSheet.create({
   ageUnitPicker: {
     marginLeft: 10,
     flex: 1,
+  },
+  header: {
+    marginBottom: 16,
+  },
+  viewToggleButton: {
+    backgroundColor: "#007AFF",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  viewToggleButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  guidelinesContainer: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  guidelineArticleButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  guidelineArticleButton: {
+    backgroundColor: "#f8f8f8",
+    padding: 12,
+    borderRadius: 8,
+    minWidth: "48%",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  selectedGuidelineArticleButton: {
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
+  },
+  guidelineArticleButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+  },
+  selectedGuidelineArticleButtonText: {
+    color: "#fff",
+  },
+  valuesContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    margin: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  testTypeSection: {
+    marginBottom: 24,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
+    padding: 12,
+  },
+  testTypeTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#007AFF",
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    paddingBottom: 8,
+  },
+  rangeRow: {
+    flexDirection: "column",
+    padding: 12,
+    backgroundColor: "#fff",
+    marginBottom: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  ageRangeText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  valuesDetailContainer: {
+    backgroundColor: "#f8f8f8",
+    padding: 8,
+    borderRadius: 6,
+  },
+  valuesText: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  selectedArticleTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 16,
+    color: "#333",
+    textAlign: "center",
+    paddingBottom: 8,
+    borderBottomWidth: 2,
+    borderBottomColor: "#007AFF",
+  },
+  testTypeButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+  },
+  testTypeButton: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    minWidth: '22%',
+    alignItems: 'center',
+  },
+  selectedTestTypeButton: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  testTypeButtonText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  selectedTestTypeButtonText: {
+    color: '#fff',
   },
 });
