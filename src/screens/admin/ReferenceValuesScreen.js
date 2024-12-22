@@ -217,14 +217,37 @@ export default function ReferenceValuesUploadScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.viewToggleButton}
-          onPress={() => setShowGuidelines(!showGuidelines)}
-        >
-          <Text style={styles.viewToggleButtonText}>
-            {showGuidelines ? "Hesaplama Tablosu" : "Kılavuz Görünümü"}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              !showGuidelines && styles.activeTabButton,
+            ]}
+            onPress={() => setShowGuidelines(false)}
+          >
+            <Text
+              style={[
+                styles.tabButtonText,
+                !showGuidelines && styles.activeTabButtonText,
+              ]}
+            >
+              Hesaplama Görünümü
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tabButton, showGuidelines && styles.activeTabButton]}
+            onPress={() => setShowGuidelines(true)}
+          >
+            <Text
+              style={[
+                styles.tabButtonText,
+                showGuidelines && styles.activeTabButtonText,
+              ]}
+            >
+              Kılavuz Görünümü
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {!showGuidelines ? (
@@ -410,21 +433,23 @@ export default function ReferenceValuesUploadScreen() {
               <Text style={styles.selectedArticleTitle}>
                 {referenceValues[selectedArticle]?.name}
               </Text>
-              
+
               <View style={styles.testTypeButtons}>
                 {testTypes.map((testType) => (
                   <TouchableOpacity
                     key={testType}
                     style={[
                       styles.testTypeButton,
-                      selectedGuidelineTest === testType && styles.selectedTestTypeButton,
+                      selectedGuidelineTest === testType &&
+                        styles.selectedTestTypeButton,
                     ]}
                     onPress={() => setSelectedGuidelineTest(testType)}
                   >
                     <Text
                       style={[
                         styles.testTypeButtonText,
-                        selectedGuidelineTest === testType && styles.selectedTestTypeButtonText,
+                        selectedGuidelineTest === testType &&
+                          styles.selectedTestTypeButtonText,
                       ]}
                     >
                       {testType}
@@ -433,42 +458,60 @@ export default function ReferenceValuesUploadScreen() {
                 ))}
               </View>
 
-              {selectedGuidelineTest && referenceValues[selectedArticle]?.values[selectedGuidelineTest] && (
-                <View style={styles.testTypeSection}>
-                  <Text style={styles.testTypeTitle}>{selectedGuidelineTest}</Text>
-                  {Object.entries(referenceValues[selectedArticle].values[selectedGuidelineTest])
-                    .sort(([ageA], [ageB]) => sortAgeRanges(ageA, ageB))
-                    .map(([ageRange, values]) => (
-                      <View key={ageRange} style={styles.rangeRow}>
-                        <Text style={styles.ageRangeText}>{ageRange}</Text>
-                        <View style={styles.valuesDetailContainer}>
-                          <Text style={styles.valuesText}>
-                            Referans Aralığı: {values.min?.toFixed(2)} - {values.max?.toFixed(2)}
-                          </Text>
-                          {values.mean && (
+              {selectedGuidelineTest &&
+                referenceValues[selectedArticle]?.values[
+                  selectedGuidelineTest
+                ] && (
+                  <View style={styles.testTypeSection}>
+                    <Text style={styles.testTypeTitle}>
+                      {selectedGuidelineTest}
+                    </Text>
+                    {Object.entries(
+                      referenceValues[selectedArticle].values[
+                        selectedGuidelineTest
+                      ]
+                    )
+                      .sort(([ageA], [ageB]) => sortAgeRanges(ageA, ageB))
+                      .map(([ageRange, values]) => (
+                        <View key={ageRange} style={styles.rangeRow}>
+                          <Text style={styles.ageRangeText}>{ageRange}</Text>
+                          <View style={styles.valuesDetailContainer}>
                             <Text style={styles.valuesText}>
-                              Ortalama: {typeof values.mean === 'object' 
-                                ? `${values.mean.value?.toFixed(2)} ± ${values.mean.sd?.toFixed(2)}`
-                                : values.mean?.toFixed(2)}
+                              Referans Aralığı: {values.min?.toFixed(2)} -{" "}
+                              {values.max?.toFixed(2)}
                             </Text>
-                          )}
-                          {values.geoMean && (
-                            <Text style={styles.valuesText}>
-                              Geometrik Ortalama: {typeof values.geoMean === 'object'
-                                ? `${values.geoMean.value?.toFixed(2)} ± ${values.geoMean.sd?.toFixed(2)}`
-                                : values.geoMean?.toFixed(2)}
-                            </Text>
-                          )}
-                          {values.confidenceInterval && (
-                            <Text style={styles.valuesText}>
-                              Güven Aralığı: {values.confidenceInterval[0]?.toFixed(2)} - {values.confidenceInterval[1]?.toFixed(2)}
-                            </Text>
-                          )}
+                            {values.mean && (
+                              <Text style={styles.valuesText}>
+                                Ortalama:{" "}
+                                {typeof values.mean === "object"
+                                  ? `${values.mean.value?.toFixed(
+                                      2
+                                    )} ± ${values.mean.sd?.toFixed(2)}`
+                                  : values.mean?.toFixed(2)}
+                              </Text>
+                            )}
+                            {values.geoMean && (
+                              <Text style={styles.valuesText}>
+                                Geometrik Ortalama:{" "}
+                                {typeof values.geoMean === "object"
+                                  ? `${values.geoMean.value?.toFixed(
+                                      2
+                                    )} ± ${values.geoMean.sd?.toFixed(2)}`
+                                  : values.geoMean?.toFixed(2)}
+                              </Text>
+                            )}
+                            {values.confidenceInterval && (
+                              <Text style={styles.valuesText}>
+                                Güven Aralığı:{" "}
+                                {values.confidenceInterval[0]?.toFixed(2)} -{" "}
+                                {values.confidenceInterval[1]?.toFixed(2)}
+                              </Text>
+                            )}
+                          </View>
                         </View>
-                      </View>
-                    ))}
-                </View>
-              )}
+                      ))}
+                  </View>
+                )}
             </View>
           )}
         </View>
@@ -688,6 +731,30 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 16,
   },
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    padding: 4,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  activeTabButton: {
+    backgroundColor: "#007AFF",
+  },
+  tabButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666",
+  },
+  activeTabButtonText: {
+    color: "#fff",
+  },
   viewToggleButton: {
     backgroundColor: "#007AFF",
     padding: 12,
@@ -815,33 +882,33 @@ const styles = StyleSheet.create({
     borderBottomColor: "#007AFF",
   },
   testTypeButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 16,
     padding: 8,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
     borderRadius: 8,
   },
   testTypeButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#ddd',
-    minWidth: '22%',
-    alignItems: 'center',
+    borderColor: "#ddd",
+    minWidth: "22%",
+    alignItems: "center",
   },
   selectedTestTypeButton: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
   },
   testTypeButtonText: {
     fontSize: 14,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
   selectedTestTypeButtonText: {
-    color: '#fff',
+    color: "#fff",
   },
 });
