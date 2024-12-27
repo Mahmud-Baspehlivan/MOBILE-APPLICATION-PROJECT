@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,24 +7,24 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  ActivityIndicator
-} from 'react-native';
-import { collection, addDoc, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
-import { Picker } from '@react-native-picker/picker';
+  ActivityIndicator,
+} from "react-native";
+import { collection, addDoc, getDocs, doc, getDoc } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { Picker } from "@react-native-picker/picker";
 
 export default function TestEntryScreen() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState('');
+  const [selectedUser, setSelectedUser] = useState("");
   const [testValues, setTestValues] = useState({
-    IgA: '',
-    IgM: '',
-    IgG: '',
-    IgG1: '',
-    IgG2: '',
-    IgG3: '',
-    IgG4: ''
+    IgA: "",
+    IgM: "",
+    IgG: "",
+    IgG1: "",
+    IgG2: "",
+    IgG3: "",
+    IgG4: "",
   });
   const [date, setDate] = useState(new Date());
 
@@ -34,27 +34,27 @@ export default function TestEntryScreen() {
 
   const fetchUsers = async () => {
     try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const usersData = usersSnapshot.docs.map(doc => ({
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const usersData = usersSnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setUsers(usersData);
     } catch (error) {
-      Alert.alert('Hata', 'Kullanıcılar yüklenirken bir hata oluştu');
+      Alert.alert("Hata", "Kullanıcılar yüklenirken bir hata oluştu");
     }
   };
 
   const validateForm = () => {
     if (!selectedUser) {
-      Alert.alert('Hata', 'Lütfen bir hasta seçin');
+      Alert.alert("Hata", "Lütfen bir hasta seçin");
       return false;
     }
 
     // En az bir değerin girilmiş olması kontrolü
-    const hasValue = Object.values(testValues).some(value => value !== '');
+    const hasValue = Object.values(testValues).some((value) => value !== "");
     if (!hasValue) {
-      Alert.alert('Hata', 'Lütfen en az bir test değeri girin');
+      Alert.alert("Hata", "Lütfen en az bir test değeri girin");
       return false;
     }
 
@@ -69,33 +69,33 @@ export default function TestEntryScreen() {
       // Sayısal değerlere dönüştür
       const numericValues = {};
       Object.entries(testValues).forEach(([key, value]) => {
-        if (value !== '') {
+        if (value !== "") {
           numericValues[key] = parseFloat(value);
         }
       });
 
       // Firestore'a kaydet
-      await addDoc(collection(db, 'users', selectedUser, 'tests'), {
+      await addDoc(collection(db, "users", selectedUser, "tests"), {
         date: new Date(date),
         values: numericValues,
         createdAt: new Date(),
-        createdBy: 'admin',
+        createdBy: "admin",
       });
 
-      Alert.alert('Başarılı', 'Tahlil değerleri kaydedildi');
-      
+      Alert.alert("Başarılı", "Tahlil değerleri kaydedildi");
+
       setTestValues({
-        IgA: '',
-        IgM: '',
-        IgG: '',
-        IgG1: '',
-        IgG2: '',
-        IgG3: '',
-        IgG4: ''
+        IgA: "",
+        IgM: "",
+        IgG: "",
+        IgG1: "",
+        IgG2: "",
+        IgG3: "",
+        IgG4: "",
       });
-      setSelectedUser('');
+      setSelectedUser("");
     } catch (error) {
-      Alert.alert('Hata', 'Tahlil değerleri kaydedilirken bir hata oluştu');
+      Alert.alert("Hata", "Tahlil değerleri kaydedilirken bir hata oluştu");
     } finally {
       setLoading(false);
     }
@@ -124,28 +124,53 @@ export default function TestEntryScreen() {
             >
               <Picker.Item label="Hasta seçin" value="" />
               {users.map((user) => (
-                <Picker.Item 
-                  key={user.id} 
-                  label={`${user.fullName} (${user.email})`} 
-                  value={user.id} 
+                <Picker.Item
+                  key={user.id}
+                  label={`${user.fullName} (${user.email})`}
+                  value={user.id}
                 />
               ))}
             </Picker>
           </View>
         </View>
 
-        {Object.keys(testValues).map((key) => (
-          <View key={key} style={styles.inputContainer}>
-            <Text style={styles.label}>{key}</Text>
-            <TextInput
-              style={styles.input}
-              value={testValues[key]}
-              onChangeText={(text) => setTestValues({ ...testValues, [key]: text })}
-              keyboardType="decimal-pad"
-              placeholder="Değer girin"
-            />
+        <View style={styles.testInputGroups}>
+          {/* Sol taraf - Ana Ig'ler */}
+          <View style={styles.testInputColumn}>
+            {["IgA", "IgM", "IgG"].map((testType) => (
+              <View key={testType} style={styles.testInputWrapper}>
+                <Text style={styles.testInputLabel}>{testType}</Text>
+                <TextInput
+                  style={styles.testInput}
+                  value={testValues[testType]}
+                  onChangeText={(value) =>
+                    setTestValues((prev) => ({ ...prev, [testType]: value }))
+                  }
+                  keyboardType="decimal-pad"
+                  placeholder="0.00"
+                />
+              </View>
+            ))}
           </View>
-        ))}
+
+          {/* Sağ taraf - IgG alt tipleri */}
+          <View style={styles.testInputColumn}>
+            {["IgG1", "IgG2", "IgG3", "IgG4"].map((testType) => (
+              <View key={testType} style={styles.testInputWrapper}>
+                <Text style={styles.testInputLabel}>{testType}</Text>
+                <TextInput
+                  style={styles.testInput}
+                  value={testValues[testType]}
+                  onChangeText={(value) =>
+                    setTestValues((prev) => ({ ...prev, [testType]: value }))
+                  }
+                  keyboardType="decimal-pad"
+                  placeholder="0.00"
+                />
+              </View>
+            ))}
+          </View>
+        </View>
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
@@ -153,7 +178,7 @@ export default function TestEntryScreen() {
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading ? 'Kaydediliyor...' : 'Kaydet'}
+            {loading ? "Kaydediliyor..." : "Kaydet"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -164,42 +189,73 @@ export default function TestEntryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     padding: 16,
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   pickerContainer: {
     marginBottom: 16,
   },
   pickerWrapper: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     marginTop: 8,
   },
   picker: {
     height: 50,
+  },
+  testInputGroups: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  testInputColumn: {
+    width: "48%",
+  },
+  testInputWrapper: {
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f8f8",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  testInputLabel: {
+    fontSize: 14,
+    color: "#666",
+    width: "40%",
+  },
+  testInput: {
+    flex: 1,
+    height: 32,
+    fontSize: 14,
+    padding: 4,
+    textAlign: "right",
   },
   inputContainer: {
     marginBottom: 16,
@@ -207,28 +263,28 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 8,
-    color: '#333',
+    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   buttonDisabled: {
-    backgroundColor: '#cccccc',
+    backgroundColor: "#cccccc",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
-  }
+    fontWeight: "bold",
+  },
 });
