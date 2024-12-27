@@ -82,116 +82,78 @@ export default function ReferenceValuesUploadScreen() {
     };
   };
 
-  const calculateResult = () => {
-    if (
-      !selectedArticle ||
-      !selectedTest ||
-      !inputValue ||
-      !selectedAge ||
-      !referenceValues
-    ) {
-      alert("Lütfen tüm alanları doldurun");
+  const [testValues, setTestValues] = useState({
+    IgA: "",
+    IgM: "",
+    IgG: "",
+    IgG1: "",
+    IgG2: "",
+    IgG3: "",
+    IgG4: "",
+  });
+
+  const calculateResults = () => {
+    if (!selectedAge || !referenceValues) {
+      alert("Lütfen yaş bilgisini doldurun");
       return;
     }
 
-    const value = parseFloat(inputValue);
-    if (isNaN(value)) {
-      alert("Geçerli bir değer girin");
-      return;
-    }
-
-    const articleData = referenceValues[selectedArticle];
-    if (
-      !articleData ||
-      !articleData.values ||
-      !articleData.values[selectedTest]
-    ) {
-      alert("Seçilen test için referans değerleri bulunamadı");
-      return;
-    }
-
-    const ageGroups = articleData.values[selectedTest];
+    const results = [];
     const age = parseFloat(selectedAge);
 
-    let matchingRange = null;
-    let matchingValues = null;
+    // Her bir kılavuz için kontrol
+    Object.entries(referenceValues).forEach(([articleId, articleData]) => {
+      // Her bir test tipi için kontrol
+      Object.entries(testValues).forEach(([testType, value]) => {
+        if (!value) return; // Boş değerleri atla
 
-    Object.entries(ageGroups).forEach(([ageRange, values]) => {
-      const { isMonths, isYears, isDays, startValue, endValue } =
-        parseAgeRange(ageRange);
+        const testValue = parseFloat(value);
+        if (isNaN(testValue)) return;
 
-      // Yaşı ve aralıkları günlere çevir
-      const ageInDays = age * (ageUnit === "years" ? 365 : 30);
-      const startInDays = startValue * (isDays ? 1 : isMonths ? 30 : 365);
-      const endInDays = endValue * (isDays ? 1 : isMonths ? 30 : 365);
+        if (articleData.values && articleData.values[testType]) {
+          const ageGroups = articleData.values[testType];
+          let matchingRange = null;
+          let matchingValues = null;
 
-      if (ageInDays >= startInDays && ageInDays <= endInDays) {
-        matchingRange = ageRange;
-        matchingValues = values;
-      }
+          Object.entries(ageGroups).forEach(([ageRange, values]) => {
+            const { isMonths, isYears, isDays, startValue, endValue } =
+              parseAgeRange(ageRange);
+            const ageInDays = age * (ageUnit === "years" ? 365 : 30);
+            const startInDays = startValue * (isDays ? 1 : isMonths ? 30 : 365);
+            const endInDays = endValue * (isDays ? 1 : isMonths ? 30 : 365);
+
+            if (ageInDays >= startInDays && ageInDays <= endInDays) {
+              matchingRange = ageRange;
+              matchingValues = values;
+            }
+          });
+
+          if (matchingValues) {
+            results.push({
+              articleName: articleData.name,
+              testType,
+              range: matchingRange,
+              min: matchingValues.min,
+              max: matchingValues.max,
+              value: testValue,
+              status:
+                testValue < (matchingValues.min ?? 0)
+                  ? "Düşük"
+                  : testValue > (matchingValues.max ?? 0)
+                  ? "Yüksek"
+                  : "Normal",
+              geoMean: matchingValues.geoMean,
+              mean: matchingValues.mean,
+              confidence: matchingValues.confidenceInterval
+                ? `${matchingValues.confidenceInterval[0]} - ${matchingValues.confidenceInterval[1]}`
+                : "Mevcut değil",
+            });
+          }
+        }
+      });
     });
 
-    if (matchingValues) {
-      try {
-        const result = {
-          range: matchingRange,
-          min: matchingValues.min,
-          max: matchingValues.max,
-          value: value,
-          status:
-            value < (matchingValues.min ?? 0)
-              ? "Düşük"
-              : value > (matchingValues.max ?? 0)
-              ? "Yüksek"
-              : "Normal",
-        };
-
-        // Optional değerler için kontroller
-        if (matchingValues.geoMean) {
-          if (typeof matchingValues.geoMean === "object") {
-            result.geoMean = {
-              value: matchingValues.geoMean.value ?? 0,
-              sd: matchingValues.geoMean.sd ?? 0,
-            };
-          } else {
-            result.geoMean = matchingValues.geoMean;
-          }
-        } else {
-          result.geoMean = 0;
-        }
-
-        if (matchingValues.mean) {
-          if (typeof matchingValues.mean === "object") {
-            result.mean = {
-              value: matchingValues.mean.value ?? 0,
-              sd: matchingValues.mean.sd ?? 0,
-            };
-          } else {
-            result.mean = matchingValues.mean;
-          }
-        } else {
-          result.mean = 0;
-        }
-
-        // Confidence interval kontrolü
-        if (
-          matchingValues.confidenceInterval &&
-          Array.isArray(matchingValues.confidenceInterval) &&
-          matchingValues.confidenceInterval.length >= 2
-        ) {
-          result.confidence = `${matchingValues.confidenceInterval[0]} - ${matchingValues.confidenceInterval[1]}`;
-        } else {
-          result.confidence = "Mevcut değil";
-        }
-
-        setResult(result);
-      } catch (error) {
-        console.error("Değer hesaplama hatası:", error);
-        alert("Değerler hesaplanırken bir hata oluştu");
-      }
-    } else {
-      alert("Bu yaş için referans aralığı bulunamadı");
-    }
+    setResult(results);
   };
 
   const sortAgeRanges = (a, b) => {
@@ -204,6 +166,18 @@ export default function ReferenceValuesUploadScreen() {
     return (
       rangeA.startValue - rangeB.startValue || rangeA.endValue - rangeB.endValue
     );
+  };
+
+  // Sonuçları test tiplerine göre grupla
+  const groupResultsByTestType = (results) => {
+    const grouped = {};
+    results.forEach((result) => {
+      if (!grouped[result.testType]) {
+        grouped[result.testType] = [];
+      }
+      grouped[result.testType].push(result);
+    });
+    return grouped;
   };
 
   if (loading) {
@@ -251,151 +225,177 @@ export default function ReferenceValuesUploadScreen() {
       </View>
 
       {!showGuidelines ? (
-        <>
-          <View style={styles.articleButtons}>
-            {referenceValues &&
-              Object.entries(referenceValues).map(
-                ([articleId, articleData]) => (
-                  <TouchableOpacity
-                    key={articleId}
-                    style={[
-                      styles.articleButton,
-                      selectedArticle === articleId &&
-                        styles.selectedArticleButton,
-                    ]}
-                    onPress={() =>
-                      setSelectedArticle(
-                        articleId === selectedArticle ? null : articleId
-                      )
+        <View style={styles.calculatorContainer}>
+          <View style={styles.testInputGroups}>
+            {/* Sol taraf - Ana Ig'ler */}
+            <View style={styles.testInputColumn}>
+              {["IgA", "IgM", "IgG"].map((testType) => (
+                <View key={testType} style={styles.testInputWrapper}>
+                  <Text style={styles.testInputLabel}>{testType}</Text>
+                  <TextInput
+                    style={styles.testInput}
+                    value={testValues[testType]}
+                    onChangeText={(value) =>
+                      setTestValues((prev) => ({ ...prev, [testType]: value }))
                     }
-                  >
-                    <Text
-                      style={[
-                        styles.articleButtonText,
-                        selectedArticle === articleId &&
-                          styles.selectedArticleButtonText,
-                      ]}
-                    >
-                      {articleData.name}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              )}
+                    keyboardType="numeric"
+                    placeholder="0.00"
+                  />
+                </View>
+              ))}
+            </View>
+
+            {/* Sağ taraf - IgG alt tipleri */}
+            <View style={styles.testInputColumn}>
+              {["IgG1", "IgG2", "IgG3", "IgG4"].map((testType) => (
+                <View key={testType} style={styles.testInputWrapper}>
+                  <Text style={styles.testInputLabel}>{testType}</Text>
+                  <TextInput
+                    style={styles.testInput}
+                    value={testValues[testType]}
+                    onChangeText={(value) =>
+                      setTestValues((prev) => ({ ...prev, [testType]: value }))
+                    }
+                    keyboardType="numeric"
+                    placeholder="0.00"
+                  />
+                </View>
+              ))}
+            </View>
           </View>
 
-          {/* Hesaplama Bölümü */}
-          <View style={styles.calculatorContainer}>
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Test Tipi</Text>
+          {/* Age Input - Keep existing age input code */}
+          <View style={styles.pickerContainer}>
+            <Text style={styles.pickerLabel}>Yaş</Text>
+            <View style={styles.ageInputContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                value={selectedAge}
+                onChangeText={setSelectedAge}
+                keyboardType="numeric"
+                placeholder="Yaş giriniz"
+              />
               <Picker
-                selectedValue={selectedTest}
-                onValueChange={(itemValue) => setSelectedTest(itemValue)}
-                style={styles.picker}
+                selectedValue={ageUnit}
+                onValueChange={(itemValue) => setAgeUnit(itemValue)}
+                style={styles.ageUnitPicker}
               >
-                <Picker.Item label="Seçiniz" value="" />
-                {testTypes.map((test) => (
-                  <Picker.Item key={test} label={test} value={test} />
-                ))}
+                <Picker.Item label="Ay" value="months" />
+                <Picker.Item label="Yıl" value="years" />
               </Picker>
             </View>
-
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Değer</Text>
-              <TextInput
-                style={styles.input}
-                value={inputValue}
-                onChangeText={setInputValue}
-                keyboardType="numeric"
-                placeholder="Değer giriniz"
-              />
-            </View>
-
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Yaş</Text>
-              <View style={styles.ageInputContainer}>
-                <TextInput
-                  style={[styles.input, { flex: 1 }]}
-                  value={selectedAge}
-                  onChangeText={setSelectedAge}
-                  keyboardType="numeric"
-                  placeholder="Yaş giriniz"
-                />
-                <Picker
-                  selectedValue={ageUnit}
-                  onValueChange={(itemValue) => setAgeUnit(itemValue)}
-                  style={styles.ageUnitPicker}
-                >
-                  <Picker.Item label="Ay" value="months" />
-                  <Picker.Item label="Yıl" value="years" />
-                </Picker>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={styles.calculateButton}
-              onPress={calculateResult}
-            >
-              <Text style={styles.calculateButtonText}>Hesapla</Text>
-            </TouchableOpacity>
-
-            {result && (
-              <View style={styles.resultContainer}>
-                <Text style={styles.resultTitle}>Sonuç</Text>
-                <Text style={styles.resultText}>
-                  Yaş Aralığı: {result.range}
-                </Text>
-                <Text style={styles.resultText}>
-                  Min: {result.min?.toFixed(3) ?? "Mevcut değil"}
-                </Text>
-                <Text style={styles.resultText}>
-                  Max: {result.max?.toFixed(3) ?? "Mevcut değil"}
-                </Text>
-
-                {/* Geometric Mean kontrolü */}
-                <Text style={styles.resultText}>
-                  Geometrik Ort:{" "}
-                  {result.geoMean
-                    ? typeof result.geoMean === "object"
-                      ? `${(result.geoMean.value - result.geoMean.sd).toFixed(
-                          3
-                        )} - ${(
-                          result.geoMean.value + result.geoMean.sd
-                        ).toFixed(3)}`
-                      : result.geoMean.toFixed(3)
-                    : "Mevcut değil"}
-                </Text>
-
-                {/* Mean kontrolü */}
-                <Text style={styles.resultText}>
-                  Ortalama:{" "}
-                  {result.mean
-                    ? typeof result.mean === "object"
-                      ? `${(result.mean.value - result.mean.sd).toFixed(
-                          3
-                        )} - ${(result.mean.value + result.mean.sd).toFixed(3)}`
-                      : result.mean.toFixed(3)
-                    : "Mevcut değil"}
-                </Text>
-
-                <Text style={styles.resultText}>
-                  Confidence: {result.confidence ?? "Mevcut değil"}
-                </Text>
-
-                <Text
-                  style={[
-                    styles.resultText,
-                    styles.statusText,
-                    result.status === "Düşük" && styles.lowStatus,
-                    result.status === "Yüksek" && styles.highStatus,
-                    result.status === "Normal" && styles.normalStatus,
-                  ]}
-                >
-                  Durum: {result.status}
-                </Text>
-              </View>
-            )}
           </View>
-        </>
+
+          <TouchableOpacity
+            style={styles.calculateButton}
+            onPress={calculateResults}
+          >
+            <Text style={styles.calculateButtonText}>Hesapla</Text>
+          </TouchableOpacity>
+
+          {/* Results Display - Updated Card Design */}
+          {result && (
+            <View style={styles.resultsContainer}>
+              {Object.entries(groupResultsByTestType(result)).map(
+                ([testType, results]) => (
+                  <View key={testType} style={styles.testResultCard}>
+                    <View style={styles.testResultHeader}>
+                      <Text style={styles.testResultTitle}>{testType}</Text>
+                      <Text style={styles.testResultValue}>
+                        Girilen değer: {results[0].value.toFixed(2)}
+                      </Text>
+                    </View>
+
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                    >
+                      {results.map((item, index) => (
+                        <View
+                          key={index}
+                          style={[
+                            styles.guidelineResultCard,
+                            {
+                              borderColor:
+                                item.status === "Düşük"
+                                  ? "#ff3b30"
+                                  : item.status === "Yüksek"
+                                  ? "#ff9500"
+                                  : "#34c759",
+                            },
+                          ]}
+                        >
+                          <Text style={styles.guidelineName}>
+                            {item.articleName}
+                          </Text>
+                          <View style={styles.resultDetails}>
+                            <Text style={styles.guidelineLabel}>
+                              Yaş Aralığı:
+                            </Text>
+                            <Text style={styles.guidelineValue}>
+                              {item.range}
+                            </Text>
+
+                            <Text style={styles.guidelineLabel}>
+                              Referans Aralığı:
+                            </Text>
+                            <Text style={styles.guidelineValue}>
+                              {item.min?.toFixed(2)} - {item.max?.toFixed(2)}
+                            </Text>
+
+                            <Text style={styles.guidelineLabel}>
+                              Geometrik Ortalama:
+                            </Text>
+                            <Text style={styles.guidelineValue}>
+                              {item.geoMean
+                                ? typeof item.geoMean === "object"
+                                  ? `${item.geoMean.value?.toFixed(
+                                      2
+                                    )} ± ${item.geoMean.sd?.toFixed(2)}`
+                                  : item.geoMean?.toFixed(2)
+                                : "Mevcut değil"}
+                            </Text>
+
+                            <Text style={styles.guidelineLabel}>
+                              Aritmetik Ortalama:
+                            </Text>
+                            <Text style={styles.guidelineValue}>
+                              {item.mean
+                                ? typeof item.mean === "object"
+                                  ? `${item.mean.value?.toFixed(
+                                      2
+                                    )} ± ${item.mean.sd?.toFixed(2)}`
+                                  : item.mean?.toFixed(2)
+                                : "Mevcut değil"}
+                            </Text>
+
+                            <Text style={styles.guidelineLabel}>
+                              Güven Aralığı:
+                            </Text>
+                            <Text style={styles.guidelineValue}>
+                              {item.confidence}
+                            </Text>
+                          </View>
+
+                          <Text
+                            style={[
+                              styles.guidelineStatus,
+                              item.status === "Düşük" && styles.lowStatus,
+                              item.status === "Yüksek" && styles.highStatus,
+                              item.status === "Normal" && styles.normalStatus,
+                            ]}
+                          >
+                            Durum: {item.status}
+                          </Text>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )
+              )}
+            </View>
+          )}
+        </View>
       ) : (
         <View style={styles.guidelinesContainer}>
           <View style={styles.articleButtons}>
@@ -911,4 +911,166 @@ const styles = StyleSheet.create({
   selectedTestTypeButtonText: {
     color: "#fff",
   },
+  testInputsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+
+  testInputWrapper: {
+    width: "48%",
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f8f8",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+
+  testInputLabel: {
+    fontSize: 14,
+    color: "#666",
+    width: "40%",
+  },
+
+  testInput: {
+    flex: 1,
+    height: 32,
+    fontSize: 14,
+    padding: 4,
+    textAlign: "right",
+  },
+  testInputGroups: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+
+  testInputColumn: {
+    width: "48%",
+  },
+
+  testInputWrapper: {
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f8f8",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+
+  testInputLabel: {
+    fontSize: 14,
+    color: "#666",
+    width: "40%",
+  },
+
+  testInput: {
+    flex: 1,
+    height: 32,
+    fontSize: 14,
+    padding: 4,
+    textAlign: "right",
+  },
+  resultsContainer: {
+    marginTop: 16,
+  },
+
+  testResultCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  testResultHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+
+  testResultTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+
+  testResultValue: {
+    fontSize: 16,
+    color: "#007AFF",
+    fontWeight: "600",
+  },
+
+  guidelineResultCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 12,
+    marginRight: 12,
+    borderWidth: 2,
+    width: 280, // Genişletildi
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  resultDetails: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 6,
+    padding: 8,
+    marginVertical: 8,
+  },
+
+  guidelineLabel: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 4,
+    fontWeight: "500",
+  },
+
+  guidelineValue: {
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 4,
+    fontWeight: "600",
+  },
+
+  guidelineName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    paddingBottom: 4,
+  },
+
+  guidelineStatus: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 8,
+    padding: 6,
+    borderRadius: 4,
+    backgroundColor: "#f8f8f8",
+  },
+
+  // ...rest of existing styles...
 });
