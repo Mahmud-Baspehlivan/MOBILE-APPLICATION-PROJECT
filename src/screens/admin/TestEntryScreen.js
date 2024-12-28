@@ -123,13 +123,15 @@ export default function TestEntryScreen() {
               style={styles.picker}
             >
               <Picker.Item label="Hasta seçin" value="" />
-              {users.map((user) => (
-                <Picker.Item
-                  key={user.id}
-                  label={`${user.fullName} (${user.email})`}
-                  value={user.id}
-                />
-              ))}
+              {users
+                .filter((user) => user.role !== "admin") // Filter out admin users
+                .map((user) => (
+                  <Picker.Item
+                    key={user.id}
+                    label={`${user.fullName} (${user.email})`}
+                    value={user.id}
+                  />
+                ))}
             </Picker>
           </View>
         </View>

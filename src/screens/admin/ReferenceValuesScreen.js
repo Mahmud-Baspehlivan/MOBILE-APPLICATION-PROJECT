@@ -1071,6 +1071,4 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#f8f8f8",
   },
-
-  // ...rest of existing styles...
 });

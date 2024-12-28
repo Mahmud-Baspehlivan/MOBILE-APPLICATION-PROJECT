@@ -385,7 +385,7 @@ export default function PatientTestsScreen() {
           onChangeText={(query) => {
             setSearchQuery(query);
             const filtered = users.filter(
-              (user) =>
+              (user) => user.role !== "admin" && 
                 user.fullName.toLowerCase().includes(query.toLowerCase()) ||
                 user.email.toLowerCase().includes(query.toLowerCase())
             );
@@ -396,7 +396,7 @@ export default function PatientTestsScreen() {
 
         {isSearchActive && (
           <FlatList
-            data={searchQuery ? filteredUsers : users}
+            data={searchQuery ? filteredUsers : users.filter(user => user.role !== "admin")}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
